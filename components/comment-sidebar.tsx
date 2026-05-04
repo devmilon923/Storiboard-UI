@@ -14,6 +14,7 @@ import {
   useGetAllReplie,
 } from "@/utils/api/endpoints";
 import { useAuth } from "@/providers/AuthContext";
+import { useInView } from "react-intersection-observer";
 
 interface CommentSidebarProps {
   post: Post | null;
@@ -33,46 +34,75 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
   >(null);
   const addComment = useAddComment();
   const addReplie = useAddReplie();
-  const [isLoadingComments, setIsLoadingComments] = useState(false);
-  const [isLoadingReplies, setIsLoadingReplies] = useState(false);
-
   const [commentInput, setCommentInput] = useState("");
   const [replyInput, setReplyInput] = useState("");
 
   const selectedComment = comments.find((c) => c.id === selectedCommentId);
-  const { data: mainComments, isLoading } = useGetAllComments(
-    post?.id as number,
-    "post",
-  );
-  const { data: replieComments, isLoading: replieLoading } =
-    useGetAllReplie(selectedCommentId);
+  const {
+    data: mainComments,
+    isLoading: mainLoading,
+    fetchNextPage: mainFetchNextPage,
+    hasNextPage: mainHasNextPage,
+    isFetchingNextPage: mainIsFetchingNextPage,
+  } = useGetAllComments(post?.id as number, "post", 5);
+  const {
+    data: replieComments,
+    isLoading: replieLoading,
+    fetchNextPage: replieFetchNextPage,
+    hasNextPage: replieHasNextPage,
+    isFetchingNextPage: replieIsFetchingNextPage,
+  } = useGetAllReplie(selectedCommentId, 5);
   const { user } = useAuth();
+  const { ref: cRef, inView: cInView } = useInView({
+    threshold: 1,
+    delay: 100,
+  });
+  const { ref: rRef, inView: rInView } = useInView({
+    threshold: 1,
+    delay: 100,
+  });
   const mainCommentsData =
     mainComments?.pages?.flatMap((page: any) => page.data) || [];
   const repliesData =
     replieComments?.pages?.flatMap((page: any) => page.data) || [];
   useEffect(() => {
-    if (isOpen && mainCommentsData && !isLoading) {
-      setIsLoadingComments(true);
+    if (cInView && mainHasNextPage && !mainIsFetchingNextPage) {
+      mainFetchNextPage();
+    }
+  }, [cInView, mainHasNextPage, mainIsFetchingNextPage, mainFetchNextPage]);
+
+  useEffect(() => {
+    if (rInView && replieHasNextPage && !replieIsFetchingNextPage) {
+      replieFetchNextPage();
+    }
+  }, [
+    rInView,
+    replieFetchNextPage,
+    replieHasNextPage,
+    replieIsFetchingNextPage,
+  ]);
+  // Reset navigation state whenever the post changes or sidebar closes
+  useEffect(() => {
+    setSelectedCommentId(null);
+    setReplies([]);
+  }, [post?.id, isOpen]);
+
+  // Sync main comments data
+  useEffect(() => {
+    if (isOpen && mainCommentsData && !mainLoading) {
       setComments(mainCommentsData);
-      setIsLoadingComments(false);
-    } else {
-      setSelectedCommentId(null);
-      setReplies([]);
+    } else if (!isOpen) {
       setComments([]);
     }
-  }, [isOpen, post?.id, isLoading, mainComments]);
+  }, [isOpen, mainIsFetchingNextPage, mainLoading]);
 
   useEffect(() => {
     if (selectedCommentId && !replieLoading && repliesData) {
-      setIsLoadingReplies(true);
       setReplies(repliesData);
-      setIsLoadingReplies(false);
     } else {
       setReplies([]);
-      setIsLoadingReplies(false);
     }
-  }, [selectedCommentId, replieLoading, replieComments]);
+  }, [selectedCommentId, replieLoading, replieIsFetchingNextPage]);
 
   const handleSendComment = async () => {
     if (!commentInput.trim()) return;
@@ -167,7 +197,7 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
             <div className="px-5 py-3 border-b flex items-center justify-between bg-background/50 shrink-0">
               <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                 All Comments
-                {!isLoadingComments && (
+                {!mainLoading && (
                   <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-[9px]">
                     {comments.length}
                   </span>
@@ -176,7 +206,7 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3 overscroll-contain">
-              {isLoadingComments ? (
+              {mainLoading ? (
                 <div className="h-full flex flex-col items-center justify-center text-muted-foreground animate-pulse">
                   <Loader2 className="size-8 animate-spin mb-4 text-primary/40" />
                   <p className="text-sm font-medium">Loading...</p>
@@ -190,6 +220,19 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
                   />
                 ))
               )}
+              <div ref={cRef} className="py-8 flex justify-center">
+                {mainIsFetchingNextPage ? (
+                  <Loader2 className="size-6 animate-spin text-primary" />
+                ) : mainHasNextPage ? (
+                  <span className="text-sm text-muted-foreground animate-pulse">
+                    Loading more comments...
+                  </span>
+                ) : (
+                  <span className="text-sm text-muted-foreground italic">
+                    You've reached the end of the comments
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="p-4 border-t bg-card/30 backdrop-blur-md shrink-0">
@@ -228,7 +271,7 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
                   <ParentCommentHeader comment={selectedComment} />
                   <Separator className="bg-border/40" />
                   <div className="space-y-6 relative pl-2">
-                    {isLoadingReplies ? (
+                    {replieLoading ? (
                       <div className="py-12 flex flex-col items-center justify-center text-muted-foreground">
                         <Loader2 className="size-6 animate-spin mb-2 text-primary/40" />
                         <p className="text-[11px] font-bold uppercase tracking-tighter">
@@ -241,6 +284,19 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
                         {replies.map((reply) => (
                           <ReplyItem key={reply.id} reply={reply} />
                         ))}
+                        <div ref={rRef} className="py-8 flex justify-center">
+                          {replieIsFetchingNextPage ? (
+                            <Loader2 className="size-6 animate-spin text-primary" />
+                          ) : replieHasNextPage ? (
+                            <span className="text-sm text-muted-foreground animate-pulse">
+                              Loading more replies...
+                            </span>
+                          ) : (
+                            <span className="text-sm text-muted-foreground italic">
+                              You've reached the end of the replies
+                            </span>
+                          )}
+                        </div>
                       </>
                     ) : (
                       <EmptyRepliesState />
