@@ -286,9 +286,10 @@ const CommentCard = ({
         likeType: "comment",
         sourceId: Number(comment.id),
       });
-      setCLikeCount((prev: any) => isCLiked ? prev - 1 : prev + 1);
+      setCLikeCount((prev: any) => (isCLiked ? prev - 1 : prev + 1));
     } catch (error) {
       setIsCLiked((prev) => !prev);
+      setCLikeCount((prev: any) => (isCLiked ? prev + 1 : prev - 1));
       console.log(error);
     }
   };
@@ -392,33 +393,56 @@ const ParentCommentHeader = ({ comment }: { comment: Comment }) => (
   </div>
 );
 
-const ReplyItem = ({ reply }: { reply: Comment }) => (
-  <div className="flex gap-4 relative group">
-    <div className="size-8 shrink-0 overflow-hidden rounded-full border border-border bg-background z-10 transition-transform group-hover:scale-105">
-      <img src={reply.user.image} className="h-full w-full object-cover" />
+const ReplyItem = ({ reply }: { reply: Comment }) => {
+  const [rLikeCount, setRLikeCount] = useState(reply.likesCount);
+  const [isRLiked, setIsRLiked] = useState(reply.isLiked);
+  const addLike = useAddLike();
+  const handleLike = async () => {
+    setIsRLiked((prev) => !prev);
+    try {
+      await addLike.mutateAsync({
+        likeType: "comment",
+        sourceId: Number(reply.id),
+      });
+      setRLikeCount((prev: any) => (isRLiked ? prev - 1 : prev + 1));
+    } catch (error) {
+      setIsRLiked((prev) => !prev);
+      setRLikeCount((prev: any) => (isRLiked ? prev + 1 : prev - 1));
+      console.log(error);
+    }
+  };
+  return (
+    <div className="flex gap-4 relative group">
+      <div className="size-8 shrink-0 overflow-hidden rounded-full border border-border bg-background z-10 transition-transform group-hover:scale-105">
+        <img src={reply.user.image} className="h-full w-full object-cover" />
+      </div>
+      <div className="flex-1 space-y-1.5">
+        <div className="flex items-center justify-between">
+          <span className="text-[13px] font-bold group-hover:text-primary transition-colors">
+            {reply.user.name}
+          </span>
+          <span className="text-[10px] font-medium text-muted-foreground/60">
+            {moment(reply.createdAt).fromNow()}
+          </span>
+        </div>
+        <div className="bg-muted/30 p-3.5 rounded-2xl rounded-tl-none border border-border/30 group-hover:bg-muted/50 transition-colors">
+          <p className="text-[13px] text-foreground/80 leading-relaxed">
+            {reply.content}
+          </p>
+        </div>
+        <div className="flex items-center gap-4 pl-1">
+          <button
+            onClick={handleLike}
+            className={`text-[10px] cursor-pointer font-bold transition-colors flex items-center gap-1 ${isRLiked ? "text-rose-500" : "text-muted-foreground hover:text-rose-500"}`}
+          >
+            <Heart className={`size-3 ${isRLiked ? "fill-rose-500" : ""}`} />{" "}
+            {rLikeCount || 0} Like
+          </button>
+        </div>
+      </div>
     </div>
-    <div className="flex-1 space-y-1.5">
-      <div className="flex items-center justify-between">
-        <span className="text-[13px] font-bold group-hover:text-primary transition-colors">
-          {reply.user.name}
-        </span>
-        <span className="text-[10px] font-medium text-muted-foreground/60">
-          {moment(reply.createdAt).fromNow()}
-        </span>
-      </div>
-      <div className="bg-muted/30 p-3.5 rounded-2xl rounded-tl-none border border-border/30 group-hover:bg-muted/50 transition-colors">
-        <p className="text-[13px] text-foreground/80 leading-relaxed">
-          {reply.content}
-        </p>
-      </div>
-      <div className="flex items-center gap-4 pl-1">
-        <button className="text-[10px] cursor-pointer font-bold text-muted-foreground hover:text-rose-500 transition-colors flex items-center gap-1">
-          <Heart className="size-3" /> Like
-        </button>
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 const CommentInput = ({
   value,
