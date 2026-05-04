@@ -35,6 +35,7 @@ export interface Comment {
   };
   content: string;
   createdAt: string;
+  isLiked: boolean;
   likesCount?: number;
   commentCount?: number;
   previewReply?: Comment;

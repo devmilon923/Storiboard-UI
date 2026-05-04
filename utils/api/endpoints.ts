@@ -193,7 +193,7 @@ export const useGetAllPosts = (limit: number) => {
 };
 
 export const useGetAllComments = (
-  sourceId: number | undefined | string | null,
+  sourceId: number,
   commentType: any,
   limit: number = 10,
 ) => {

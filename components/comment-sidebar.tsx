@@ -8,6 +8,7 @@ import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
 import {
   useAddComment,
+  useAddLike,
   useAddReplie,
   useGetAllComments,
   useGetAllReplie,
@@ -39,11 +40,13 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
   const [replyInput, setReplyInput] = useState("");
 
   const selectedComment = comments.find((c) => c.id === selectedCommentId);
-  const { data: mainComments, isLoading } = useGetAllComments(post?.id, "post");
+  const { data: mainComments, isLoading } = useGetAllComments(
+    post?.id as number,
+    "post",
+  );
   const { data: replieComments, isLoading: replieLoading } =
     useGetAllReplie(selectedCommentId);
   const { user } = useAuth();
-  // console.log(user);
   const mainCommentsData =
     mainComments?.pages?.flatMap((page: any) => page.data) || [];
   const repliesData =
@@ -271,74 +274,98 @@ const CommentCard = ({
 }: {
   comment: Comment;
   onSelect: () => void;
-}) => (
-  <div className="group relative p-4 rounded-2xl cursor-pointer transition-all duration-300 border bg-background border-border/40 hover:border-primary/10 hover:bg-muted/30">
-    <div className="flex gap-4">
-      <div className="size-10 shrink-0 overflow-hidden rounded-full border border-border shadow-sm">
-        <img
-          src={comment.user.image}
-          className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
-        />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-sm font-bold truncate group-hover:text-primary transition-colors">
-            {comment.user.name}
-          </span>
-          <span className="text-[10px] font-medium text-muted-foreground/60">
-            {moment(comment.createdAt).fromNow(true)}
-          </span>
-        </div>
-        <p className="text-[13px] leading-relaxed text-foreground/80 line-clamp-2">
-          {comment.content}
-        </p>
-        <div className="flex items-center gap-5 mt-3">
-          <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground hover:text-rose-500 transition-colors">
-            <Heart className="size-3.5" />
-            <span>{comment.likesCount || 0}</span>
-          </div>
-          <div
-            onClick={onSelect}
-            className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground hover:text-primary transition-colors"
-          >
-            <MessageCircle className="size-3.5" />
-            <span>{comment.commentCount || 0}</span>
-          </div>
-        </div>
+}) => {
+  const [cLikeCount, setCLikeCount] = useState(comment.likesCount);
+  const [isCLiked, setIsCLiked] = useState(comment.isLiked);
+  const addLike = useAddLike();
 
-        {comment.commentCount === 1 && comment.previewReply && (
-          <div className="mt-3 pt-3 border-t border-border/30">
-            <div className="flex gap-3 bg-muted/20 p-2.5 rounded-xl border border-border/20">
-              <div className="size-6 shrink-0 overflow-hidden rounded-full">
-                <img
-                  src={comment.previewReply.user.image}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[11px] font-extrabold">
-                    {comment.previewReply.user.name}
-                  </span>
-                  <span className="text-[9px] text-muted-foreground/50">
-                    {moment(comment.previewReply.createdAt).fromNow()}
-                  </span>
+  const handleLike = async () => {
+    setIsCLiked((prev) => !prev);
+    try {
+      await addLike.mutateAsync({
+        likeType: "comment",
+        sourceId: Number(comment.id),
+      });
+      setCLikeCount((prev: any) => isCLiked ? prev - 1 : prev + 1);
+    } catch (error) {
+      setIsCLiked((prev) => !prev);
+      console.log(error);
+    }
+  };
+  return (
+    <div className="group relative p-4 rounded-2xl cursor-pointer transition-all duration-300 border bg-background border-border/40 hover:border-primary/10 hover:bg-muted/30">
+      <div className="flex gap-4">
+        <div className="size-10 shrink-0 overflow-hidden rounded-full border border-border shadow-sm">
+          <img
+            src={comment.user.image}
+            className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-sm font-bold truncate group-hover:text-primary transition-colors">
+              {comment.user.name}
+            </span>
+            <span className="text-[10px] font-medium text-muted-foreground/60">
+              {moment(comment.createdAt).fromNow(true)}
+            </span>
+          </div>
+          <p className="text-[13px] leading-relaxed text-foreground/80 line-clamp-2">
+            {comment.content}
+          </p>
+          <div className="flex items-center gap-5 mt-3">
+            <div
+              onClick={handleLike}
+              className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isCLiked ? "text-rose-500" : "text-muted-foreground hover:text-rose-500"}`}
+            >
+              <Heart
+                className={`size-3.5 ${isCLiked ? "fill-rose-500" : ""}`}
+              />
+              <span>{cLikeCount || 0}</span>
+            </div>
+            <div
+              onClick={onSelect}
+              className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground hover:text-primary transition-colors"
+            >
+              <MessageCircle className="size-3.5" />
+              <span>{comment.commentCount || 0}</span>
+            </div>
+          </div>
+
+          {comment.commentCount === 1 && comment.previewReply && (
+            <div className="mt-3 pt-3 border-t border-border/30">
+              <div className="flex gap-3 bg-muted/20 p-2.5 rounded-xl border border-border/20">
+                <div className="size-6 shrink-0 overflow-hidden rounded-full">
+                  <img
+                    src={comment.previewReply.user.image}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
-                <p className="text-[11px] text-foreground/70 line-clamp-1 italic mb-1">
-                  "{comment.previewReply.content}"
-                </p>
-                <div className="flex items-center gap-1 text-[9px] font-bold text-muted-foreground/70">
-                  <Heart className="size-2.5" />
-                  <span>{comment.previewReply.likesCount || 0}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[11px] font-extrabold">
+                      {comment.previewReply.user.name}
+                    </span>
+                    <span className="text-[9px] text-muted-foreground/50">
+                      {moment(comment.previewReply.createdAt).fromNow()}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-foreground/70 line-clamp-1 italic mb-1">
+                    "{comment.previewReply.content}"
+                  </p>
+                  <div className="flex items-center gap-1 text-[9px] font-bold text-muted-foreground/70">
+                    <Heart className="size-2.5" />
+                    <span>{comment.previewReply.likesCount || 0}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const ParentCommentHeader = ({ comment }: { comment: Comment }) => (
   <div className="relative">
@@ -445,89 +472,3 @@ const EmptyRepliesState = () => (
     </p>
   </div>
 );
-
-// --- DUMMY DATA ---
-
-const dummyComments: Comment[] = [
-  {
-    id: 1,
-    user: {
-      name: "Sarah Wilson",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-    },
-    content:
-      "This is absolutely incredible! I love the attention to detail here. The design looks very premium.",
-    createdAt: "2024-04-25T08:00:00Z",
-    likesCount: 24,
-    commentCount: 3,
-  },
-  {
-    id: 2,
-    user: {
-      name: "Marcus Chen",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
-    },
-    content: "How did you manage to get that smooth transition effect?",
-    createdAt: "2024-04-25T05:00:00Z",
-    likesCount: 12,
-    commentCount: 2,
-  },
-  {
-    id: 4,
-    user: {
-      name: "David Smith",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
-    },
-    content: "The color palette is so soothing. Perfect for a social platform.",
-    createdAt: "2024-04-23T10:00:00Z",
-    likesCount: 5,
-    commentCount: 1,
-    previewReply: {
-      id: "preview-1",
-      user: {
-        name: "Olivia Wilde",
-        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Olivia",
-      },
-      content: "Yes, the dark mode implementation is particularly clean.",
-      createdAt: "2024-04-23T11:00:00Z",
-      likesCount: 3,
-    },
-  },
-];
-
-const dummyReplies: Record<string | number, Comment[]> = {
-  1: [
-    {
-      id: "r1",
-      user: {
-        name: "James Anderson",
-        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=James",
-      },
-      content: "Couldn't agree more, Sarah!",
-      createdAt: "2024-04-25T08:30:00Z",
-      likesCount: 4,
-    },
-    {
-      id: "r2",
-      user: {
-        name: "Sarah Wilson",
-        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-      },
-      content: "Thanks James! Glad you like it.",
-      createdAt: "2024-04-25T09:00:00Z",
-      likesCount: 2,
-    },
-  ],
-  2: [
-    {
-      id: "r4",
-      user: {
-        name: "Admin",
-        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Admin",
-      },
-      content: "We used Framer Motion!",
-      createdAt: "2024-04-25T06:00:00Z",
-      likesCount: 6,
-    },
-  ],
-};
