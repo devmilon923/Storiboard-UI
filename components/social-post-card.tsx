@@ -16,6 +16,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import moment from "moment";
+import z from "zod";
+import { likeValidation } from "@/utils/api/validations";
+import { useAddLike } from "@/utils/api/endpoints";
 
 interface Author {
   name: string;
@@ -43,6 +46,7 @@ export interface Post {
   content: string;
   createdAt: string;
   likesCount: number;
+  isLiked: Boolean;
   commentsCount: number;
   feeling?: {
     emoji: string;
@@ -59,12 +63,11 @@ interface SocialPostCardProps {
 
 export const SocialPostCard: React.FC<SocialPostCardProps> = ({
   post,
-  className,
   onOpenComments,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(post.isLiked);
   const [replyingToCommentId, setReplyingToCommentId] = useState<
     string | number | null
   >(null);
@@ -73,7 +76,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
   );
 
   const [replyValue, setReplyValue] = useState("");
-
+  const addPostLike = useAddLike();
   const toggleCommentLike = (id: string | number) => {
     setLikedComments((prev) => {
       const next = new Set(prev);
@@ -84,7 +87,6 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
   };
 
   const handleFollow = () => setIsFollowing(!isFollowing);
-  const handleLike = () => setIsLiked(!isLiked);
 
   const handleReply = (data: {
     commentId: string | number;
@@ -92,7 +94,15 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
   }) => {
     console.log("handleReply", data);
   };
-
+  const handlePostLike = async (data: z.infer<typeof likeValidation>) => {
+    console.log("handlePostLike", data);
+    try {
+      if (data) {
+        await addPostLike.mutateAsync(data);
+        setIsLiked(!isLiked);
+      }
+    } catch (error) {}
+  };
   const formatNumber = (num: number) => {
     if (num >= 1000) return (num / 1000).toFixed(1) + "k";
     return num;
@@ -173,7 +183,9 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
         <Button
           variant="ghost"
           size="sm"
-          onClick={handleLike}
+          onClick={() =>
+            handlePostLike({ likeType: "post", sourceId: Number(post.id) })
+          }
           className={`flex-1 cursor-pointer gap-2 transition-colors group ${
             isLiked
               ? "text-rose-500 bg-rose-500/5"

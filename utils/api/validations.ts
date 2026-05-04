@@ -99,3 +99,7 @@ export const commentValidation = z.object({
   sourceId: z.number().min(1, "Comment source id is required"),
   commentType: z.enum(["post", "replie"]),
 });
+export const likeValidation = z.object({
+  sourceId: z.number().min(1, "Like source id is required"),
+  likeType: z.enum(["post", "replie", "comment"]),
+});

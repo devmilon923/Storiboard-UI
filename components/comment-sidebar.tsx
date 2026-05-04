@@ -48,7 +48,6 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
     mainComments?.pages?.flatMap((page: any) => page.data) || [];
   const repliesData =
     replieComments?.pages?.flatMap((page: any) => page.data) || [];
-  console.log(replieComments, "repliesData");
   useEffect(() => {
     if (isOpen && mainCommentsData && !isLoading) {
       setIsLoadingComments(true);
@@ -152,7 +151,7 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="rounded-full hover:bg-muted/50"
+          className="rounded-full hover:bg-muted/50 cursor-pointer"
         >
           <X className="size-5" />
         </Button>
@@ -212,7 +211,7 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 gap-2 rounded-full px-3 text-[11px] font-bold hover:bg-muted"
+                className="h-8 cursor-pointer gap-2 rounded-full px-3 text-[11px] font-bold hover:bg-muted"
                 onClick={() => setSelectedCommentId(null)}
               >
                 <Reply className="size-3 rotate-180" />
@@ -273,10 +272,7 @@ const CommentCard = ({
   comment: Comment;
   onSelect: () => void;
 }) => (
-  <div
-    onClick={onSelect}
-    className="group relative p-4 rounded-2xl cursor-pointer transition-all duration-300 border bg-background border-border/40 hover:border-primary/10 hover:bg-muted/30"
-  >
+  <div className="group relative p-4 rounded-2xl cursor-pointer transition-all duration-300 border bg-background border-border/40 hover:border-primary/10 hover:bg-muted/30">
     <div className="flex gap-4">
       <div className="size-10 shrink-0 overflow-hidden rounded-full border border-border shadow-sm">
         <img
@@ -301,7 +297,10 @@ const CommentCard = ({
             <Heart className="size-3.5" />
             <span>{comment.likesCount || 0}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground hover:text-primary transition-colors">
+          <div
+            onClick={onSelect}
+            className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground hover:text-primary transition-colors"
+          >
             <MessageCircle className="size-3.5" />
             <span>{comment.commentCount || 0}</span>
           </div>
@@ -386,7 +385,7 @@ const ReplyItem = ({ reply }: { reply: Comment }) => (
         </p>
       </div>
       <div className="flex items-center gap-4 pl-1">
-        <button className="text-[10px] font-bold text-muted-foreground hover:text-rose-500 transition-colors flex items-center gap-1">
+        <button className="text-[10px] cursor-pointer font-bold text-muted-foreground hover:text-rose-500 transition-colors flex items-center gap-1">
           <Heart className="size-3" /> Like
         </button>
       </div>

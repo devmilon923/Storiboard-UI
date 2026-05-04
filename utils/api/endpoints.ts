@@ -1,5 +1,10 @@
 import axios from "axios";
-import { commentValidation, TLogin, TRegister } from "./validations";
+import {
+  commentValidation,
+  likeValidation,
+  TLogin,
+  TRegister,
+} from "./validations";
 import {
   useInfiniteQuery,
   useMutation,
@@ -241,14 +246,20 @@ export const useAddComment = () => {
 };
 
 export const useAddReplie = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: z.infer<typeof commentValidation>) => {
       const result = await api.post("/post/comments", data);
       return result.data;
     },
-    onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: ["replie"] });
+    onSuccess: () => {},
+  });
+};
+export const useAddLike = () => {
+  return useMutation({
+    mutationFn: async (data: z.infer<typeof likeValidation>) => {
+      const result = await api.patch("/post/likes", data);
+      return result.data;
     },
+    onSuccess: () => {},
   });
 };
