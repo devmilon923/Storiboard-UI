@@ -18,9 +18,10 @@ import { Input } from "@/components/ui/input";
 import moment from "moment";
 import z from "zod";
 import { likeValidation } from "@/utils/api/validations";
-import { useAddLike } from "@/utils/api/endpoints";
+import { useAddLike, useFollowerAction } from "@/utils/api/endpoints";
 
 interface Author {
+  id: number;
   name: string;
   image: string;
   isVerifyed: boolean;
@@ -75,7 +76,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
   const [likedComments, setLikedComments] = useState<Set<string | number>>(
     new Set(),
   );
-
+  const follow = useFollowerAction();
   const [replyValue, setReplyValue] = useState("");
   const addPostLike = useAddLike();
   const toggleCommentLike = (id: string | number) => {
@@ -87,7 +88,14 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
     });
   };
 
-  const handleFollow = () => setIsFollowing(!isFollowing);
+  const handleFollow = async (userId: number) => {
+    try {
+      await follow.mutateAsync(userId);
+      setIsFollowing(!isFollowing);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleReply = (data: {
     commentId: string | number;
@@ -148,7 +156,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
           </div>
         </div>
         <Button
-          onClick={handleFollow}
+          onClick={() => handleFollow(post.author.id)}
           variant={isFollowing ? "outline" : "default"}
           size="sm"
           className={`h-9 px-4 cursor-pointer font-bold rounded-full transition-all duration-300 shadow-sm ${

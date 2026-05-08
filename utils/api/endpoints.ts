@@ -263,3 +263,13 @@ export const useAddLike = () => {
     onSuccess: () => {},
   });
 };
+
+export const useFollowerAction = () => {
+  return useMutation({
+    mutationFn: async (userId: number) => {
+      const result = await api.patch(`/user/follow/${userId}`);
+      return result.data;
+    },
+    onSuccess: () => {},
+  });
+};
