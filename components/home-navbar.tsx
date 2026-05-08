@@ -83,19 +83,27 @@ export const HomeNavbar = () => {
                     <div className="relative">
                       <div
                         className={cn(
-                          "flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground uppercase overflow-hidden  border-green-900 border-2 transition-transform group-hover:scale-110",
+                          "relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-secondary text-[10px] font-bold text-secondary-foreground uppercase overflow-hidden border-2 border-background shadow-sm ring-1 ring-border transition-all duration-300 group-hover:ring-primary/50 group-hover:shadow-md",
                           isActive &&
-                            "ring-2 ring-primary ring-offset-2 ring-offset-background",
+                            "ring-primary shadow-primary/20 shadow-md",
                         )}
                       >
-                        <Image
-                          src={user.image}
-                          alt={user.name}
-                          width={100}
-                          height={100}
-                          className="w-full h-full object-cover"
-                        />
+                        {user.image ? (
+                          <Image
+                            src={user.image}
+                            alt={user.name}
+                            width={100}
+                            height={100}
+                            className="w-fit h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary">
+                            {user.name?.charAt(0)}
+                          </div>
+                        )}
                       </div>
+                      {/* Status Indicator */}
+                      <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-500 shadow-sm" />
                     </div>
 
                     {isActive && (
@@ -105,31 +113,65 @@ export const HomeNavbar = () => {
 
                   {/* Dropdown Menu */}
                   {isMenuOpen && (
-                    <div className="absolute top-full mt-2 right-0 min-w-[180px] overflow-hidden rounded-xl border border-border bg-background/95 p-1 shadow-xl backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="px-3 py-2 border-b border-border/50">
-                        <p className="text-xs font-semibold truncate">
-                          {user.name}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground truncate">
-                          {user.email}
-                        </p>
+                    <div className="absolute top-full mt-3 right-0 min-w-[220px] overflow-hidden rounded-2xl border border-border bg-background/95 p-1.5 shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-200 ease-out">
+                      <div className="px-3 py-3 mb-1 border-b border-border/50">
+                        <div className="flex items-center gap-3">
+                          <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase overflow-hidden">
+                            {user.image ? (
+                              <Image
+                                src={user.image}
+                                alt={user.name}
+                                width={40}
+                                height={40}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              user.name?.charAt(0)
+                            )}
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <p className="text-sm font-bold truncate leading-tight">
+                              {user.name}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground truncate">
+                              {user.email}
+                            </p>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="py-1">
+                      <div className="space-y-0.5">
                         <Link
                           href="/home/profile"
                           onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center gap-2 px-3 py-2 text-xs transition-colors hover:bg-accent hover:text-accent-foreground rounded-md group"
+                          className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium transition-all hover:bg-accent hover:text-accent-foreground rounded-xl group"
                         >
-                          <Settings className="size-3.5 text-muted-foreground group-hover:text-foreground" />
-                          <span>Profile Settings</span>
+                          <div className="flex size-8 items-center justify-center rounded-lg bg-accent group-hover:bg-background transition-colors">
+                            <User className="size-4 text-muted-foreground group-hover:text-primary" />
+                          </div>
+                          <span>My Profile</span>
                         </Link>
+
+                        <Link
+                          href="/home/profile?tab=settings"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium transition-all hover:bg-accent hover:text-accent-foreground rounded-xl group"
+                        >
+                          <div className="flex size-8 items-center justify-center rounded-lg bg-accent group-hover:bg-background transition-colors">
+                            <Settings className="size-4 text-muted-foreground group-hover:text-primary" />
+                          </div>
+                          <span>Settings</span>
+                        </Link>
+
+                        <div className="my-1 border-t border-border/50" />
 
                         <button
                           onClick={handleLogout}
-                          className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-xs transition-colors hover:bg-rose-500/10 hover:text-rose-500 rounded-md group text-left"
+                          className="flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-[13px] font-medium transition-all hover:bg-rose-500/10 hover:text-rose-500 rounded-xl group text-left"
                         >
-                          <LogOut className="size-3.5  text-muted-foreground group-hover:text-rose-500" />
+                          <div className="flex size-8 items-center justify-center rounded-lg bg-rose-500/10 group-hover:bg-rose-500/20 transition-colors">
+                            <LogOut className="size-4 text-rose-500" />
+                          </div>
                           <span>Logout</span>
                         </button>
                       </div>

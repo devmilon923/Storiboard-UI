@@ -37,7 +37,6 @@ import {
   User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import z from "zod";
 import {
   InputOTP,
   InputOTPGroup,
@@ -95,11 +94,13 @@ function RegisterPage() {
 
     if (step === 5) {
       try {
-        const result: any = await register.mutateAsync(form.getValues());
+        await register.mutateAsync(form.getValues());
         setStep(6);
-        console.log(result.data);
       } catch (error: any) {
-        console.log(error?.message);
+        form.setError("email", {
+          type: "manual",
+          message: error?.response?.data?.message,
+        });
       }
     } else if (step < 6) {
       setStep(step + 1);

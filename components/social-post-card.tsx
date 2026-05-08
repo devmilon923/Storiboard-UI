@@ -19,6 +19,7 @@ import moment from "moment";
 import z from "zod";
 import { likeValidation } from "@/utils/api/validations";
 import { useAddLike, useFollowerAction } from "@/utils/api/endpoints";
+import { useAuth } from "@/providers/AuthContext";
 
 interface Author {
   id: number;
@@ -49,6 +50,7 @@ export interface Post {
   createdAt: string;
   likesCount: number;
   isLiked: Boolean;
+  isFollowing: Boolean;
   commentsCount: number;
   feeling?: {
     emoji: string;
@@ -68,7 +70,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
   onOpenComments,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(post.isFollowing);
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [replyingToCommentId, setReplyingToCommentId] = useState<
     string | number | null
@@ -76,6 +78,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
   const [likedComments, setLikedComments] = useState<Set<string | number>>(
     new Set(),
   );
+  const { user } = useAuth();
   const follow = useFollowerAction();
   const [replyValue, setReplyValue] = useState("");
   const addPostLike = useAddLike();
@@ -104,7 +107,6 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
     console.log("handleReply", data);
   };
   const handlePostLike = async (data: z.infer<typeof likeValidation>) => {
-    console.log("handlePostLike", data);
     try {
       if (data) {
         await addPostLike.mutateAsync(data);
@@ -155,23 +157,25 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
             <span>{moment(post.createdAt).fromNow()}</span>
           </div>
         </div>
-        <Button
-          onClick={() => handleFollow(post.author.id)}
-          variant={isFollowing ? "outline" : "default"}
-          size="sm"
-          className={`h-9 px-4 cursor-pointer font-bold rounded-full transition-all duration-300 shadow-sm ${
-            isFollowing
-              ? "border-primary/20 hover:bg-primary/5 text-primary"
-              : "shadow-primary/20 hover:-translate-y-px active:translate-y-0"
-          }`}
-        >
-          {isFollowing ? (
-            <UserCheck className="size-4 mr-1.5" />
-          ) : (
-            <UserPlus className="size-4 mr-1.5" />
-          )}
-          {isFollowing ? "Following" : "Follow"}
-        </Button>
+        {post.author.id !== user?.id && (
+          <Button
+            onClick={() => handleFollow(post.author.id)}
+            variant={isFollowing ? "outline" : "default"}
+            size="sm"
+            className={`h-9 px-4 cursor-pointer font-bold rounded-full transition-all duration-300 shadow-sm ${
+              isFollowing
+                ? "border-primary/20 hover:bg-primary/5 text-primary"
+                : "shadow-primary/20 hover:-translate-y-px active:translate-y-0"
+            }`}
+          >
+            {isFollowing ? (
+              <UserCheck className="size-4 mr-1.5" />
+            ) : (
+              <UserPlus className="size-4 mr-1.5" />
+            )}
+            {isFollowing ? "Following" : "Follow"}
+          </Button>
+        )}
       </CardHeader>
 
       <CardContent className="px-4 pb-4 pt-0 min-w-0">
