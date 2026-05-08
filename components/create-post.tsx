@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Smile, Send, X, Sparkles } from "lucide-react";
+import { Smile, Send, X, Sparkles, SquarePen } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,6 +25,7 @@ export const CreatePost = () => {
   const { user } = useAuth();
   const [content, setContent] = useState("");
   const [showFeelings, setShowFeelings] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [selectedFeeling, setSelectedFeeling] = useState<{
     emoji: string;
     label: string;
@@ -42,27 +43,67 @@ export const CreatePost = () => {
       if (result) {
         setContent("");
         setSelectedFeeling(null);
+        setIsExpanded(false);
       }
     } catch (error: any) {
       console.log(error.message);
     }
   };
 
+  if (!isExpanded) {
+    return (
+      <Card
+        className="max-w-2xl w-full mx-auto border border-border/50 shadow-sm bg-card cursor-pointer hover:bg-accent/5 transition-all duration-200 group"
+        onClick={() => setIsExpanded(true)}
+      >
+        <CardContent className="p-3 flex items-center gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground uppercase border border-border">
+            {user?.name?.charAt(0) || "U"}
+          </div>
+          <div className="flex-1 text-muted-foreground/60 text-sm font-medium">
+            What's on your mind, {user?.name?.split(" ")[0] || "User"}?
+          </div>
+          <div className="flex items-center gap-3 pr-2 ml-auto">
+            <div className="hidden sm:flex items-center gap-3">
+              <Smile className="size-5 text-muted-foreground group-hover:text-amber-500 transition-colors" />
+              <Sparkles className="size-5 text-muted-foreground group-hover:text-indigo-500 transition-colors" />
+            </div>
+            <div className="flex sm:hidden">
+              <SquarePen className="size-5 text-primary group-hover:scale-110 transition-transform" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="max-w-2xl w-full mx-auto border-none shadow-sm bg-card overflow-visible">
+    <Card className="max-w-2xl w-full mx-auto border border-border/50 shadow-md bg-card overflow-visible animate-in fade-in slide-in-from-top-2 duration-200">
       <CardContent className="p-4 w-full">
         <div className="flex gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground uppercase overflow-hidden border border-border">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground uppercase border border-border">
             {user?.name?.charAt(0) || "U"}
           </div>
 
           <div className="flex-1 min-w-0 space-y-3">
             <div className="relative">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-primary uppercase tracking-widest">
+                  Create Post
+                </span>
+                <button
+                  onClick={() => setIsExpanded(false)}
+                  className="p-1 hover:bg-muted cursor-pointer rounded-full text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
               <Textarea
+                autoFocus
                 placeholder={`What's on your mind, ${user?.name?.split(" ")[0] || "User"}?`}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="w-full min-h-[80px] resize-none rounded-none border-none bg-transparent p-0 text-[1rem] focus-visible:ring-0 placeholder:text-muted-foreground/60"
+                className="w-full min-h-[100px] resize-none rounded-none border-none bg-transparent p-0 py-2 text-[1rem] focus-visible:ring-0 placeholder:text-muted-foreground/60"
               />
 
               {selectedFeeling && (
@@ -81,7 +122,7 @@ export const CreatePost = () => {
               )}
             </div>
 
-            <div className="flex items-center justify-between border-t pt-3">
+            <div className="flex items-center justify-between border-t border-border/50 pt-3">
               <div className="flex items-center gap-1">
                 <div className="relative">
                   <Button

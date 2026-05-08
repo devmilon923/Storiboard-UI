@@ -4,22 +4,28 @@ import { SocialPostCard, Post } from "@/components/social-post-card";
 import { CreatePost } from "@/components/create-post";
 import { useGetAllPosts } from "@/utils/api/endpoints";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { CommentSidebar } from "@/components/comment-sidebar";
 import { useInView } from "react-intersection-observer";
 const HomePage: React.FC = () => {
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    status,
-  } = useGetAllPosts(5);
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useGetAllPosts(5);
 
   const posts: Post[] = data?.pages.flatMap((page: any) => page.data) || [];
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"foryou" | "trending">("trending");
+  const router = useRouter();
   const { ref, inView } = useInView({ threshold: 1, delay: 100 });
+
+  const handleTabChange = (tab: "foryou" | "trending") => {
+    setActiveTab(tab);
+    if (tab === "foryou") {
+      router.push("/home/foryou");
+    } else {
+      router.push("/home");
+    }
+  };
   const handleOpenComments = (post: Post) => {
     setSelectedPost(post);
     setIsSidebarOpen(true);
@@ -31,7 +37,6 @@ const HomePage: React.FC = () => {
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
   const handleCloseSidebar = () => {
     setIsSidebarOpen(false);
-    // Delay clearing post to avoid UI jump during animation
     setTimeout(() => setSelectedPost(null), 300);
   };
 
@@ -51,13 +56,33 @@ const HomePage: React.FC = () => {
           <CreatePost />
 
           <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-border/50 pb-2">
-              <h1 className="text-xl font-bold tracking-tight text-foreground">
-                Recent Activity
-              </h1>
-              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                Feed
-              </span>
+            <div className="flex items-center gap-8 border-b border-border/50 px-2">
+              <button
+                onClick={() => handleTabChange("trending")}
+                className={`relative flex items-center justify-center pb-3 text-sm tracking-tight transition-colors ${
+                  activeTab === "trending"
+                    ? "font-bold text-foreground"
+                    : "font-medium text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <span>Trending</span>
+                {activeTab === "trending" && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-primary" />
+                )}
+              </button>
+              <button
+                onClick={() => handleTabChange("foryou")}
+                className={`relative flex items-center justify-center pb-3 text-sm tracking-tight transition-colors ${
+                  activeTab === "foryou"
+                    ? "font-bold text-foreground"
+                    : "font-medium text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <span>For You</span>
+                {activeTab === "foryou" && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-primary" />
+                )}
+              </button>
             </div>
 
             <div className="flex flex-col gap-6 pb-20">
