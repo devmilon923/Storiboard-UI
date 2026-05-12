@@ -14,6 +14,9 @@ const HomePage: React.FC = () => {
   const posts: Post[] = data?.pages.flatMap((page: any) => page.data) || [];
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [initialCommentId, setInitialCommentId] = useState<
+    string | number | null
+  >(null);
   const [activeTab, setActiveTab] = useState<"foryou" | "trending">("trending");
   const router = useRouter();
   const { ref, inView } = useInView({ threshold: 1, delay: 100 });
@@ -26,8 +29,9 @@ const HomePage: React.FC = () => {
       router.push("/home");
     }
   };
-  const handleOpenComments = (post: Post) => {
+  const handleOpenComments = (post: Post, commentId?: string | number) => {
     setSelectedPost(post);
+    setInitialCommentId(commentId || null);
     setIsSidebarOpen(true);
   };
   useEffect(() => {
@@ -37,7 +41,10 @@ const HomePage: React.FC = () => {
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
   const handleCloseSidebar = () => {
     setIsSidebarOpen(false);
-    setTimeout(() => setSelectedPost(null), 300);
+    setTimeout(() => {
+      setSelectedPost(null);
+      setInitialCommentId(null);
+    }, 300);
   };
 
   if (isLoading) {
@@ -90,7 +97,9 @@ const HomePage: React.FC = () => {
                 <SocialPostCard
                   key={post.id}
                   post={post}
-                  onOpenComments={() => handleOpenComments(post)}
+                  onOpenComments={(commentId) =>
+                    handleOpenComments(post, commentId)
+                  }
                 />
               ))}
               <div ref={ref} className="py-8 flex justify-center">
@@ -116,6 +125,7 @@ const HomePage: React.FC = () => {
         post={selectedPost}
         isOpen={isSidebarOpen}
         onClose={handleCloseSidebar}
+        initialCommentId={initialCommentId}
       />
     </div>
   );

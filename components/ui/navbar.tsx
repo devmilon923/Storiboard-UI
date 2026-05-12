@@ -73,8 +73,16 @@ export default function Navbar() {
                 onClick={() => setMenuOpen((prev) => !prev)}
                 className="flex items-center gap-2 rounded-full border border-border/70 bg-muted/50 px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground uppercase">
-                  {user.name?.charAt(0) || <User size={14} />}
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary uppercase overflow-hidden border border-primary/20">
+                  {user.image ? (
+                    <img
+                      src={user.image}
+                      alt={user.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    user.name?.charAt(0) || <User size={14} />
+                  )}
                 </span>
 
                 <span className="hidden sm:inline">{user.name}</span>

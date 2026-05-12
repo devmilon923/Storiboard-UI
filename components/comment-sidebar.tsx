@@ -20,12 +20,14 @@ interface CommentSidebarProps {
   post: Post | null;
   isOpen: boolean;
   onClose: () => void;
+  initialCommentId?: string | number | null;
 }
 
 export const CommentSidebar: React.FC<CommentSidebarProps> = ({
   post,
   isOpen,
   onClose,
+  initialCommentId,
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [replies, setReplies] = useState<Comment[]>([]);
@@ -83,9 +85,9 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
   ]);
   // Reset navigation state whenever the post changes or sidebar closes
   useEffect(() => {
-    setSelectedCommentId(null);
+    setSelectedCommentId(initialCommentId || null);
     setReplies([]);
-  }, [post?.id, isOpen]);
+  }, [post?.id, isOpen, initialCommentId]);
 
   // Sync main comments data
   useEffect(() => {
@@ -241,6 +243,7 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
                 onChange={setCommentInput}
                 onSend={() => handleSendComment()}
                 placeholder="Add a comment..."
+                userImage={user?.image}
               />
             </div>
           </div>
@@ -312,7 +315,7 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
                 onChange={setReplyInput}
                 onSend={handleSendReply}
                 placeholder={`Reply to ${selectedComment?.user.name.split(" ")[0]}...`}
-                userImage={post.author.image}
+                userImage={user?.image}
               />
             </div>
           </div>

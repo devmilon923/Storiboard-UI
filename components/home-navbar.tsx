@@ -94,11 +94,11 @@ export const HomeNavbar = () => {
                             alt={user.name}
                             width={100}
                             height={100}
-                            className="w-fit h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary">
-                            {user.name?.charAt(0)}
+                          <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary font-bold">
+                            {user.name?.charAt(0) || "U"}
                           </div>
                         )}
                       </div>
@@ -116,7 +116,7 @@ export const HomeNavbar = () => {
                     <div className="absolute top-full mt-3 right-0 min-w-[220px] overflow-hidden rounded-2xl border border-border bg-background/95 p-1.5 shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-200 ease-out">
                       <div className="px-3 py-3 mb-1 border-b border-border/50">
                         <div className="flex items-center gap-3">
-                          <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase overflow-hidden">
+                          <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase overflow-hidden border border-border/50">
                             {user.image ? (
                               <Image
                                 src={user.image}
@@ -126,7 +126,7 @@ export const HomeNavbar = () => {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              user.name?.charAt(0)
+                              user.name?.charAt(0) || "U"
                             )}
                           </div>
                           <div className="flex flex-col min-w-0">

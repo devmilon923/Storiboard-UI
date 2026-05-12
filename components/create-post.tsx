@@ -9,6 +9,7 @@ import { useAuth } from "@/providers/AuthContext";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useCreatePost } from "@/utils/api/endpoints";
+import Image from "next/image";
 
 const FEELINGS = [
   { emoji: "😊", label: "Happy" },
@@ -34,7 +35,6 @@ export const CreatePost = () => {
   const handlePost = async () => {
     if (!content.trim()) return;
     if (!selectedFeeling) return;
-    console.log("Posting:");
     const data = { content, feeling: selectedFeeling };
     // Reset
 
@@ -58,16 +58,28 @@ export const CreatePost = () => {
         onClick={() => setIsExpanded(true)}
       >
         <CardContent className="p-3 flex items-center gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground uppercase border border-border">
-            {user?.name?.charAt(0) || "U"}
+          <div className="size-10 shrink-0 overflow-hidden rounded-full border-2 border-primary/20 shadow-sm bg-primary/10">
+            {user?.image ? (
+              <Image
+                src={user.image}
+                alt={user.name}
+                width={100}
+                height={100}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-xs font-bold text-primary uppercase">
+                {user?.name?.charAt(0) || "U"}
+              </div>
+            )}
           </div>
           <div className="flex-1 text-muted-foreground/60 text-sm font-medium">
             What's on your mind, {user?.name?.split(" ")[0] || "User"}?
           </div>
           <div className="flex items-center gap-3 pr-2 ml-auto">
             <div className="hidden sm:flex items-center gap-3">
-              <Smile className="size-5 text-muted-foreground group-hover:text-amber-500 transition-colors" />
-              <Sparkles className="size-5 text-muted-foreground group-hover:text-indigo-500 transition-colors" />
+              <Smile className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              <Sparkles className="size-5 text-muted-foreground group-hover:text-primary/80 transition-colors" />
             </div>
             <div className="flex sm:hidden">
               <SquarePen className="size-5 text-primary group-hover:scale-110 transition-transform" />
@@ -82,8 +94,18 @@ export const CreatePost = () => {
     <Card className="max-w-2xl w-full mx-auto border border-border/50 shadow-md bg-card overflow-visible animate-in fade-in slide-in-from-top-2 duration-200">
       <CardContent className="p-4 w-full">
         <div className="flex gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground uppercase border border-border">
-            {user?.name?.charAt(0) || "U"}
+          <div className="size-10 shrink-0 overflow-hidden rounded-full border-2 border-primary/20 shadow-sm bg-primary/10">
+            {user?.image ? (
+              <img
+                src={user.image}
+                alt={user.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-xs font-bold text-primary uppercase">
+                {user?.name?.charAt(0) || "U"}
+              </div>
+            )}
           </div>
 
           <div className="flex-1 min-w-0 space-y-3">
@@ -130,8 +152,8 @@ export const CreatePost = () => {
                     variant="ghost"
                     size="icon-sm"
                     className={cn(
-                      "text-muted-foreground  hover:text-amber-500 hover:bg-amber-500/5 cursor-pointer",
-                      showFeelings && "text-amber-500 bg-amber-500/5",
+                      "text-muted-foreground  hover:text-primary hover:bg-primary/5 cursor-pointer",
+                      showFeelings && "text-primary bg-primary/5",
                     )}
                     onClick={() => setShowFeelings(!showFeelings)}
                   >
@@ -166,7 +188,7 @@ export const CreatePost = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-muted-foreground hover:text-indigo-500 hover:bg-indigo-500/5 cursor-pointer gap-1.5 px-2"
+                  className="text-muted-foreground hover:text-primary hover:bg-primary/5 cursor-pointer gap-1.5 px-2"
                 >
                   <Sparkles className="size-4" />
                   <Link href="/home/advanced-editor">
@@ -178,7 +200,8 @@ export const CreatePost = () => {
               <Button
                 onClick={handlePost}
                 disabled={!content.trim() || !selectedFeeling}
-                className="gap-2 px-6 cursor-pointer rounded-full shadow-md shadow-primary/20 transition-all hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50"
+                variant="premium"
+                className="gap-2 px-6 rounded-full"
               >
                 <span className="font-semibold">Post</span>
                 <Send className="size-3.5" />
