@@ -167,7 +167,7 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
   if (!isOpen || !post) return null;
 
   return (
-    <aside className="w-full lg:w-[450px] h-full flex flex-col bg-background border-l shadow-2xl animate-in slide-in-from-right duration-300">
+    <aside className="w-full lg:w-[450px] h-full flex flex-col bg-background border-l shadow-xl animate-in slide-in-from-right duration-300">
       {/* Header Section */}
       <header className="flex items-center justify-between p-5 border-b bg-card/50 backdrop-blur-md shrink-0">
         <div className="flex items-center gap-3">
