@@ -170,10 +170,26 @@ export const useCreatePost = () => {
       } | null;
     }) => {
       const result = await api.post("/post/create", data);
-      return result.data;
+      return result.data.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    onSuccess: (newPost) => {
+      if (!newPost) return;
+
+      queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
+        if (!oldData || !oldData.pages) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any, index: number) => {
+            if (index === 0) {
+              return {
+                ...page,
+                data: [newPost, ...(page.data || [])],
+              };
+            }
+            return page;
+          }),
+        };
+      });
     },
   });
 };

@@ -41,6 +41,7 @@ export const CreatePost = () => {
     try {
       const result = await createPost.mutateAsync(data);
       if (result) {
+        console.log(result);
         setContent("");
         setSelectedFeeling(null);
         setIsExpanded(false);
