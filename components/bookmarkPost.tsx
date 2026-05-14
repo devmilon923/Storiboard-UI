@@ -5,11 +5,11 @@ import {
   MessageCircle,
   Share2,
   Bookmark,
-  MoreHorizontal,
   BadgeCheck,
   Loader2,
   Feather,
 } from "lucide-react";
+import DOMPurify from "dompurify";
 import {
   Card,
   CardContent,
@@ -142,10 +142,13 @@ function BookmarkCard({
         </div>
       </CardHeader>
 
-      <CardContent className="px-5 pb-4 pt-0">
-        <p className="text-[14px] leading-relaxed text-foreground/80 whitespace-pre-wrap">
-          {displayContent}
-        </p>
+      <CardContent className="px-5 pb-4 pt-0 min-w-0">
+        <div
+          className="text-[14px] leading-relaxed text-foreground/80 whitespace-pre-wrap wrap-break-word overflow-hidden [&>p]:mb-2 [&>ul]:list-disc [&>ol]:list-decimal [&>ul]:ml-4 [&>ol]:ml-4"
+          dangerouslySetInnerHTML={{
+            __html: typeof window !== "undefined" ? DOMPurify.sanitize(displayContent) : displayContent
+          }}
+        />
         {isLongText && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}

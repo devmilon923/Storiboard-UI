@@ -11,6 +11,7 @@ import {
   Clock,
   Feather,
 } from "lucide-react";
+import DOMPurify from "dompurify";
 import {
   Card,
   CardHeader,
@@ -242,9 +243,12 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
       </CardHeader>
 
       <CardContent className="px-5 pb-4 pt-0 min-w-0">
-        <p className="text-[14px] leading-relaxed text-foreground/80 whitespace-pre-wrap wrap-break-word overflow-hidden">
-          {displayContent}
-        </p>
+        <div
+          className="text-[14px] leading-relaxed text-foreground/80 whitespace-pre-wrap wrap-break-word overflow-hidden [&>p]:mb-2 [&>ul]:list-disc [&>ol]:list-decimal [&>ul]:ml-4 [&>ol]:ml-4"
+          dangerouslySetInnerHTML={{
+            __html: typeof window !== "undefined" ? DOMPurify.sanitize(displayContent) : displayContent
+          }}
+        />
         {isLongText && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
