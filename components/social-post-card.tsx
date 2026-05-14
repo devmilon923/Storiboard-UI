@@ -25,6 +25,7 @@ import { likeValidation } from "@/utils/api/validations";
 import {
   useAddLike,
   useAddReplie,
+  useBookmarkAction,
   useFollowerAction,
 } from "@/utils/api/endpoints";
 import { useAuth } from "@/providers/AuthContext";
@@ -81,27 +82,19 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isFollowing, setIsFollowing] = useState(post.isFollowing);
-  const [isLiked, setIsLiked] = useState(post.isLiked);
+  const [isLiked, setIsLiked] = useState(post.isLiked || false);
   const [replyingToCommentId, setReplyingToCommentId] = useState<
     string | number | null
   >(null);
   const [likedComments, setLikedComments] = useState<Set<string | number>>(
     new Set(),
   );
+  const savePost = useBookmarkAction();
   const { user } = useAuth();
   const follow = useFollowerAction();
   const [replyValue, setReplyValue] = useState("");
   const addPostLike = useAddLike();
   const addCommentReplie = useAddReplie();
-
-  const toggleCommentLike = (id: string | number) => {
-    setLikedComments((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
 
   const handleFollow = async (userId: number) => {
     try {
@@ -132,14 +125,25 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
       if (data) {
         await addPostLike.mutateAsync(data);
         setIsLiked(!isLiked);
+        post.likesCount = isLiked ? post.likesCount - 1 : post.likesCount + 1;
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
   const formatNumber = (num: number) => {
     if (num >= 1000) return (num / 1000).toFixed(1) + "k";
     return num;
   };
-
+  const handleBookmark = async (postId: number) => {
+    console.log(postId);
+    try {
+      await savePost.mutateAsync(postId);
+      setIsBookmarked(!isBookmarked);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const readTime = calculateReadTime(post.content);
 
   const isLongText = post.content.length > 200;
@@ -275,7 +279,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
               }`}
             />
             <span className="text-[11px] font-bold">
-              {formatNumber(post.likesCount + (isLiked ? 1 : 0))}
+              {formatNumber(post.likesCount)}
             </span>
           </Button>
 
@@ -303,7 +307,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setIsBookmarked(!isBookmarked)}
+          onClick={() => handleBookmark(+post.id)}
           className={`size-8 rounded-full transition-all duration-300 ${
             isBookmarked
               ? "text-primary bg-primary/10 shadow-inner"

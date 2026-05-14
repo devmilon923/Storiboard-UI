@@ -279,7 +279,15 @@ export const useAddLike = () => {
     onSuccess: () => {},
   });
 };
-
+export const useBookmarkAction = () => {
+  return useMutation({
+    mutationFn: async (postId: number) => {
+      const result = await api.patch(`/post/bookmark/${postId}`);
+      return result.data;
+    },
+    onSuccess: () => {},
+  });
+};
 export const useFollowerAction = () => {
   return useMutation({
     mutationFn: async (userId: number) => {

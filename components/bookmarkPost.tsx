@@ -8,11 +8,17 @@ import {
   MoreHorizontal,
   BadgeCheck,
 } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import moment from "moment";
 
 import { calculateReadTime } from "@/utils/helpers";
+import Image from "next/image";
 
 interface BookmarkItem {
   id: number;
@@ -93,12 +99,14 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
   const readTime = calculateReadTime(item.post.content);
 
   return (
-    <Card className="group relative overflow-hidden bg-card/40 border-border/40 hover:border-primary/20 transition-all duration-300 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-500 rounded-3xl">
+    <Card className="group relative overflow-hidden bg-card/40 border-border/40 hover:border-primary/20 transition-all duration-300 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 rounded-3xl">
       <CardHeader className="flex flex-row items-start gap-4 p-5 pb-3">
         <div className="relative size-10 shrink-0">
           <div className="h-full w-full overflow-hidden rounded-full border-2 border-primary/20 shadow-sm">
-            <img
-              src={item.post.author.image}
+            <Image
+              width={100}
+              height={100}
+              src={item.post?.author?.image}
               alt={item.post.author.name}
               className="h-full w-full object-cover"
             />
@@ -121,7 +129,9 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
           </div>
 
           <div className="flex items-center gap-y-1 gap-x-2 text-[11px] font-medium text-muted-foreground/60 flex-wrap">
-            <span className="text-primary/60 truncate">{item.post.author.profession}</span>
+            <span className="text-primary/60 truncate">
+              {item.post.author.profession}
+            </span>
             <span className="size-0.5 rounded-full bg-border" />
             <div className="flex items-center gap-1.5">
               <div className="flex items-center gap-1">
@@ -156,7 +166,9 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
             className="h-8 gap-1.5 rounded-full px-3 text-muted-foreground hover:text-primary hover:bg-primary/5"
           >
             <Heart className="size-4" />
-            <span className="text-[11px] font-bold">{item.post.likesCount}</span>
+            <span className="text-[11px] font-bold">
+              {item.post.likesCount}
+            </span>
           </Button>
 
           <Button
@@ -165,7 +177,9 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
             className="h-8 gap-1.5 rounded-full px-3 text-muted-foreground hover:text-primary hover:bg-primary/5"
           >
             <MessageCircle className="size-4" />
-            <span className="text-[11px] font-bold">{item.post.commentsCount}</span>
+            <span className="text-[11px] font-bold">
+              {item.post.commentsCount}
+            </span>
           </Button>
 
           <Button
@@ -198,10 +212,12 @@ function BookmarkPost() {
         <div className="size-20 rounded-full bg-primary/5 flex items-center justify-center mb-6 border border-primary/10 shadow-inner">
           <BookOpen className="size-10 text-primary/40" />
         </div>
-        <h3 className="text-xl font-bold text-foreground mb-2">Your Reading List</h3>
+        <h3 className="text-xl font-bold text-foreground mb-2">
+          Your Reading List
+        </h3>
         <p className="text-muted-foreground max-w-xs mx-auto">
-          Stories you save will appear here. This feature is coming soon to help you build your
-          personal library.
+          Stories you save will appear here. This feature is coming soon to help
+          you build your personal library.
         </p>
       </div>
     );
