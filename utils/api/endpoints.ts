@@ -280,12 +280,25 @@ export const useAddLike = () => {
   });
 };
 export const useBookmarkAction = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (postId: number) => {
       const result = await api.patch(`/post/bookmark/${postId}`);
       return result.data;
     },
-    onSuccess: () => {},
+    onSuccess: (data, postId) => {
+      queryClient.invalidateQueries({ queryKey: ["savePosts"] });
+      queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
+        if (!oldData || !oldData.pages) return oldData;
+        const filteredData = oldData.pages.map((page: any) => {
+          return {
+            ...page,
+            data: page.data.filter((post: any) => post.id !== postId),
+          };
+        });
+        return { ...oldData, pages: filteredData };
+      });
+    },
   });
 };
 export const useFollowerAction = () => {
@@ -295,5 +308,20 @@ export const useFollowerAction = () => {
       return result.data;
     },
     onSuccess: () => {},
+  });
+};
+export const useGetAllSavePosts = (limit: number, isActive: boolean) => {
+  return useInfiniteQuery({
+    queryKey: ["savePosts", { limit, isActive }],
+    queryFn: async ({ pageParam = 0 }) => {
+      const result = await api.get(
+        `/post/bookmarks/?limit=${limit}&pc=${pageParam}`,
+      );
+      return result.data;
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage?.cursor,
+    enabled: typeof window !== "undefined" && isActive,
+    retry: false,
   });
 };

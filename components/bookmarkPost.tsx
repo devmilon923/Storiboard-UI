@@ -7,6 +7,7 @@ import {
   Bookmark,
   MoreHorizontal,
   BadgeCheck,
+  Loader2,
 } from "lucide-react";
 import {
   Card,
@@ -19,6 +20,9 @@ import moment from "moment";
 
 import { calculateReadTime } from "@/utils/helpers";
 import Image from "next/image";
+import { useGetAllSavePosts } from "@/utils/api/endpoints";
+import { useInView } from "react-intersection-observer";
+import { useEffect } from "react";
 
 interface BookmarkItem {
   id: number;
@@ -30,70 +34,13 @@ interface BookmarkItem {
       name: string;
       image: string;
       profession: string;
-      isVerified: boolean;
+      isVerifyed: boolean;
     };
     createdAt: string;
     likesCount: number;
     commentsCount: number;
   };
 }
-
-const dummyBookmarks: BookmarkItem[] = [
-  {
-    id: 1,
-    createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-    post: {
-      id: 101,
-      content:
-        "Just finished exploring the latest features in Next.js 14. The Server Actions and Partial Prerendering are absolute game changers for performance! 🚀 #webdev #nextjs",
-      author: {
-        name: "Alex River",
-        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-        profession: "Full Stack Developer",
-        isVerified: true,
-      },
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      likesCount: 124,
-      commentsCount: 18,
-    },
-  },
-  {
-    id: 2,
-    createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    post: {
-      id: 102,
-      content:
-        "Digital minimalism isn't about using less technology, it's about using technology more intentionally. I've cut my screen time by 40% and my focus has never been better. 🧠✨",
-      author: {
-        name: "Sarah Chen",
-        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-        profession: "Product Designer",
-        isVerified: true,
-      },
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      likesCount: 89,
-      commentsCount: 12,
-    },
-  },
-  {
-    id: 3,
-    createdAt: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
-    post: {
-      id: 103,
-      content:
-        "When designing for global markets, remember that accessibility isn't a feature—it's a fundamental requirement. Design for everyone, or you're excluding a billion users. 🌍🤝",
-      author: {
-        name: "Marcus Thorne",
-        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
-        profession: "UX Lead",
-        isVerified: false,
-      },
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      likesCount: 256,
-      commentsCount: 45,
-    },
-  },
-];
 
 function BookmarkCard({ item }: { item: BookmarkItem }) {
   const readTime = calculateReadTime(item.post.content);
@@ -119,7 +66,7 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
               <span className="text-sm font-bold text-foreground truncate">
                 {item.post.author.name}
               </span>
-              {item.post.author.isVerified && (
+              {item.post.author.isVerifyed && (
                 <BadgeCheck className="size-3.5 fill-primary text-primary-foreground" />
               )}
             </div>
@@ -203,10 +150,21 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
   );
 }
 
-function BookmarkPost() {
-  const hasBookmarks = dummyBookmarks.length > 0;
+function BookmarkPost({ isActive }: { isActive: boolean }) {
+  const { ref, inView } = useInView({ threshold: 1, delay: 100 });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useGetAllSavePosts(10, isActive);
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage]);
+  const bookmarks = data?.pages.flatMap(
+    (page: any) => page.data || [],
+  ) as BookmarkItem[];
 
-  if (!hasBookmarks) {
+  console.log(bookmarks);
+  if (!bookmarks) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="size-20 rounded-full bg-primary/5 flex items-center justify-center mb-6 border border-primary/10 shadow-inner">
@@ -229,7 +187,7 @@ function BookmarkPost() {
         <div>
           <h3 className="text-2xl font-bold text-foreground">Saved Posts</h3>
           <p className="text-sm text-muted-foreground">
-            {dummyBookmarks.length} posts in your library
+            {bookmarks.length} posts in your library
           </p>
         </div>
         <Button variant="outline" size="sm" className="rounded-full font-bold">
@@ -238,9 +196,22 @@ function BookmarkPost() {
       </div>
 
       <div className="flex flex-col gap-4">
-        {dummyBookmarks.map((bookmark) => (
+        {bookmarks.map((bookmark) => (
           <BookmarkCard key={bookmark.id} item={bookmark} />
         ))}
+        <div ref={ref} className="py-8 flex justify-center">
+          {isFetchingNextPage ? (
+            <Loader2 className="size-6 animate-spin text-primary" />
+          ) : hasNextPage ? (
+            <span className="text-sm text-muted-foreground animate-pulse">
+              Loading more bookmarks...
+            </span>
+          ) : (
+            <span className="text-sm text-muted-foreground italic">
+              You've reached the end of the bookmarks
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

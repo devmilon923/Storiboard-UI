@@ -116,7 +116,7 @@ const HomePage: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <BookmarkPost />
+                <BookmarkPost isActive={activeTab === "save" ? true : false} />
               )}
             </div>
           </div>
