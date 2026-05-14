@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { CommentSidebar } from "@/components/comment-sidebar";
 import { useInView } from "react-intersection-observer";
 import { Button } from "@/components/ui/button";
+import BookmarkPost from "@/components/bookmarkPost";
 const HomePage: React.FC = () => {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetAllPosts(5);
@@ -115,25 +116,7 @@ const HomePage: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="size-20 rounded-full bg-primary/5 flex items-center justify-center mb-6 border border-primary/10 shadow-inner">
-                    <BookOpen className="size-10 text-primary/40" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">
-                    Your Reading List
-                  </h3>
-                  <p className="text-muted-foreground max-w-xs mx-auto">
-                    Stories you save will appear here. This feature is coming
-                    soon to help you build your personal library.
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="mt-8 rounded-full px-8 hover:bg-primary/5 hover:text-primary transition-all"
-                    onClick={() => setActiveTab("trending")}
-                  >
-                    Go back to Trending
-                  </Button>
-                </div>
+                <BookmarkPost />
               )}
             </div>
           </div>

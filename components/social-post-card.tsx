@@ -28,6 +28,7 @@ import {
   useFollowerAction,
 } from "@/utils/api/endpoints";
 import { useAuth } from "@/providers/AuthContext";
+import { calculateReadTime } from "@/utils/helpers";
 
 interface Author {
   id: number;
@@ -139,13 +140,6 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
     return num;
   };
 
-  const calculateReadTime = (text: string) => {
-    const wordsPerMinute = 200;
-    const words = text.trim().split(/\s+/).length;
-    const minutes = Math.ceil(words / wordsPerMinute);
-    return minutes;
-  };
-
   const readTime = calculateReadTime(post.content);
 
   const isLongText = post.content.length > 200;
@@ -154,10 +148,10 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
     : post.content.slice(0, 200) + (isLongText ? "..." : "");
 
   return (
-    <Card className="w-full bg-card/40 border-border/40 shadow-sm rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-sm">
-      <CardHeader className="flex flex-row items-start gap-3 sm:gap-4 p-4 sm:p-6">
+    <Card className="group relative w-full overflow-hidden bg-card/40 border-border/40 hover:border-primary/20 transition-all duration-300 backdrop-blur-sm rounded-3xl">
+      <CardHeader className="flex flex-row items-start gap-4 p-5 pb-3">
         {/* Avatar Section */}
-        <div className="relative size-10 sm:size-12 shrink-0">
+        <div className="relative size-10 shrink-0">
           <div className="h-full w-full overflow-hidden rounded-full border-2 border-primary/20 shadow-sm">
             <img
               src={post.author.image}
@@ -168,15 +162,15 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-1 flex-col min-w-0 pt-0.5 sm:pt-0">
+        <div className="flex flex-1 flex-col min-w-0">
           {/* Top Row: Name + Follow Button */}
-          <div className="flex items-center justify-between gap-2 mb-1 sm:mb-1.5">
+          <div className="flex items-center justify-between gap-2 mb-1">
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-[0.9375rem] sm:text-[1rem] font-bold tracking-tight text-foreground truncate">
+              <span className="text-sm font-bold text-foreground truncate">
                 {post.author.name}
               </span>
               {post.author.isVerifyed && (
-                <BadgeCheck className="size-3.5 sm:size-4 fill-primary text-primary-foreground shrink-0" />
+                <BadgeCheck className="size-3.5 fill-primary text-primary-foreground shrink-0" />
               )}
             </div>
 
@@ -185,16 +179,16 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
                 onClick={() => handleFollow(post.author.id)}
                 variant={isFollowing ? "outline" : "default"}
                 size="sm"
-                className={`h-7 sm:h-9 px-3 sm:px-6 cursor-pointer font-bold rounded-full text-[10px] sm:text-sm transition-all duration-300 shrink-0 ${
+                className={`h-7 px-4 cursor-pointer font-bold rounded-full text-[10px] transition-all duration-300 shrink-0 ${
                   isFollowing
                     ? "border-primary/20 hover:bg-primary/5 text-primary"
                     : "bg-primary text-primary-foreground shadow-md shadow-primary/10 hover:shadow-primary/20"
                 }`}
               >
                 {isFollowing ? (
-                  <UserCheck className="size-3 sm:size-4 mr-1 sm:mr-1.5" />
+                  <UserCheck className="size-3 mr-1" />
                 ) : (
-                  <UserPlus className="size-3 sm:size-4 mr-1 sm:mr-1.5" />
+                  <UserPlus className="size-3 mr-1" />
                 )}
                 {isFollowing ? "Following" : "Follow"}
               </Button>
@@ -203,15 +197,15 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
 
           {/* Middle Row: Feeling Badge */}
           {post.feeling && (
-            <div className="flex items-center gap-1.5 mb-2 sm:mb-2">
-              <span className="text-muted-foreground/40 italic text-[10px] sm:text-[11px] font-medium shrink-0">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span className="text-muted-foreground/40 italic text-[10px] font-medium shrink-0">
                 is feeling
               </span>
-              <span className="font-bold text-primary/80 bg-primary/5 px-2.5 py-0.5 rounded-full flex items-center gap-1.5 border border-primary/10 shadow-sm shadow-primary/5">
-                <span className="text-[12px] sm:text-[13px] leading-none">
+              <span className="font-bold text-primary/80 bg-primary/5 px-2 py-0.5 rounded-full flex items-center gap-1 border border-primary/10 shadow-sm shadow-primary/5">
+                <span className="text-[11px] leading-none">
                   {post.feeling.emoji}
                 </span>
-                <span className="tracking-wider uppercase text-[8px] sm:text-[9px]">
+                <span className="tracking-wider uppercase text-[8px]">
                   {post.feeling.label}
                 </span>
               </span>
@@ -219,22 +213,22 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
           )}
 
           {/* Bottom Row: Metadata */}
-          <div className="flex items-center gap-y-1.5 gap-x-2 sm:gap-x-2.5 text-[11px] sm:text-[12px] font-medium text-muted-foreground/60 flex-wrap">
-            <span className="text-primary/60 truncate max-w-[100px] sm:max-w-none">
+          <div className="flex items-center gap-y-1 gap-x-2 text-[11px] font-medium text-muted-foreground/60 flex-wrap">
+            <span className="text-primary/60 truncate max-w-[120px]">
               {post.author.profession}
             </span>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="size-0.5 sm:size-1 rounded-full bg-border/60" />
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="size-0.5 rounded-full bg-border" />
               <div className="flex items-center gap-1">
-                <Clock className="size-2.5 sm:size-3 opacity-70" />
+                <Clock className="size-2.5 opacity-70" />
                 <span>{moment(post.createdAt).fromNow()}</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="size-0.5 sm:size-1 rounded-full bg-border/60" />
-              <span className="bg-primary/10 text-primary/80 px-2 py-0.5 rounded-md text-[8px] sm:text-[9px] uppercase tracking-widest font-extrabold whitespace-nowrap">
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="size-0.5 rounded-full bg-border" />
+              <span className="bg-primary/10 text-primary/80 px-2 py-0.5 rounded-md text-[8px] uppercase tracking-widest font-extrabold whitespace-nowrap">
                 {readTime} min read
               </span>
             </div>
@@ -242,45 +236,45 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
         </div>
       </CardHeader>
 
-      <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0 min-w-0">
-        <p className="text-[0.9375rem] sm:text-[1.0625rem] leading-[1.6] sm:leading-[1.7] text-foreground/80 whitespace-pre-wrap wrap-break-word overflow-hidden font-serif">
+      <CardContent className="px-5 pb-4 pt-0 min-w-0">
+        <p className="text-[14px] leading-relaxed text-foreground/80 whitespace-pre-wrap wrap-break-word overflow-hidden">
           {displayContent}
         </p>
         {isLongText && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-3 sm:mt-4 flex items-center gap-2 text-[0.875rem] sm:text-[0.9375rem] font-bold text-primary hover:text-primary/80 cursor-pointer transition-all hover:gap-3 group/read"
+            className="mt-3 flex items-center gap-2 text-[13px] font-bold text-primary hover:text-primary/80 cursor-pointer transition-all hover:gap-3 group/read"
           >
             <span className="underline decoration-primary/30 underline-offset-4 group-hover/read:decoration-primary">
               {isExpanded ? "Close story" : "Continue reading"}
             </span>
             <Feather
-              className={`size-3.5 sm:size-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+              className={`size-3.5 transition-transform ${isExpanded ? "rotate-180" : ""}`}
             />
           </button>
         )}
       </CardContent>
 
-      <CardFooter className="flex items-center gap-1.5 sm:gap-2 border-t border-border/40 bg-muted/5 p-2 px-3 sm:px-4">
-        <div className="flex flex-1 items-center gap-0.5 sm:gap-1">
+      <CardFooter className="flex items-center justify-between gap-2 border-t border-border/10 bg-muted/5 p-2 px-4">
+        <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="sm"
             onClick={() =>
               handlePostLike({ likeType: "post", sourceId: Number(post.id) })
             }
-            className={`cursor-pointer gap-1.5 sm:gap-2 transition-all duration-300 rounded-full px-3 sm:px-4 h-8 sm:h-9 ${
+            className={`h-8 gap-1.5 rounded-full px-3 transition-all duration-300 ${
               isLiked
                 ? "text-primary bg-primary/10"
                 : "text-muted-foreground hover:text-primary hover:bg-primary/5"
             }`}
           >
             <Heart
-              className={`size-4 sm:size-4.5 transition-transform duration-300 ${
+              className={`size-4 transition-transform duration-300 ${
                 isLiked ? "fill-primary scale-110" : ""
               }`}
             />
-            <span className="text-[11px] sm:text-xs font-bold">
+            <span className="text-[11px] font-bold">
               {formatNumber(post.likesCount + (isLiked ? 1 : 0))}
             </span>
           </Button>
@@ -289,10 +283,10 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => onOpenComments?.()}
-            className="cursor-pointer gap-1.5 sm:gap-2 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300 rounded-full px-3 sm:px-4 h-8 sm:h-9"
+            className="h-8 gap-1.5 rounded-full px-3 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300"
           >
-            <MessageCircle className="size-4 sm:size-4.5" />
-            <span className="text-[11px] sm:text-xs font-bold">
+            <MessageCircle className="size-4" />
+            <span className="text-[11px] font-bold">
               {formatNumber(post.commentsCount)}
             </span>
           </Button>
@@ -300,12 +294,9 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
           <Button
             variant="ghost"
             size="sm"
-            className="cursor-pointer gap-1.5 sm:gap-2 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300 rounded-full px-3 sm:px-4 h-8 sm:h-9"
+            className="h-8 gap-1.5 rounded-full px-3 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300"
           >
-            <Share2 className="size-4 sm:size-4.5" />
-            <span className="text-[11px] sm:text-xs font-bold sm:inline hidden">
-              Share
-            </span>
+            <Share2 className="size-4" />
           </Button>
         </div>
 
@@ -313,14 +304,14 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
           variant="ghost"
           size="icon"
           onClick={() => setIsBookmarked(!isBookmarked)}
-          className={`size-8 sm:size-9 cursor-pointer transition-all duration-300 rounded-full ${
+          className={`size-8 rounded-full transition-all duration-300 ${
             isBookmarked
               ? "text-primary bg-primary/10 shadow-inner"
               : "text-muted-foreground hover:text-primary hover:bg-primary/5"
           }`}
         >
           <Bookmark
-            className={`size-4 sm:size-4.5 transition-all duration-500 ${isBookmarked ? "fill-primary scale-110" : ""}`}
+            className={`size-4 transition-all duration-500 ${isBookmarked ? "fill-primary scale-110" : ""}`}
           />
         </Button>
       </CardFooter>

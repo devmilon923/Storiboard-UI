@@ -68,8 +68,8 @@ export default function Page() {
         className="pointer-events-none absolute inset-0 -z-10"
         aria-hidden="true"
       >
-        <div className="absolute -top-[25%] left-1/3 h-[700px] w-[700px] rounded-full bg-primary/[0.03] blur-[140px]" />
-        <div className="absolute -bottom-[10%] right-1/4 h-[500px] w-[500px] rounded-full bg-primary/[0.02] blur-[120px]" />
+        <div className="absolute -top-[25%] left-1/3 h-[700px] w-[700px] rounded-full bg-primary/3 blur-[140px]" />
+        <div className="absolute -bottom-[10%] right-1/4 h-[500px] w-[500px] rounded-full bg-primary/2 blur-[120px]" />
       </div>
 
       {/* ─── Navbar ─── */}

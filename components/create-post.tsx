@@ -57,7 +57,7 @@ export const CreatePost = () => {
         className="max-w-2xl w-full mx-auto border border-border/50 shadow-sm bg-card cursor-pointer hover:bg-accent/5 transition-all duration-200 group"
         onClick={() => setIsExpanded(true)}
       >
-        <CardContent className="p-3 flex items-center gap-4">
+        <CardContent className="p-4 flex items-center gap-4">
           <div className="size-10 shrink-0 overflow-hidden rounded-full border-2 border-primary/20 shadow-sm bg-primary/10">
             {user?.image ? (
               <Image
