@@ -287,16 +287,21 @@ export const useBookmarkAction = () => {
       return result.data;
     },
     onSuccess: (data, postId) => {
+      console.log(data);
       queryClient.invalidateQueries({ queryKey: ["savePosts"] });
       queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
         if (!oldData || !oldData.pages) return oldData;
-        const filteredData = oldData.pages.map((page: any) => {
-          return {
-            ...page,
-            data: page.data.filter((post: any) => post.id !== postId),
-          };
-        });
-        return { ...oldData, pages: filteredData };
+        if (data.data === true) {
+          const filteredData = oldData.pages.map((page: any) => {
+            return {
+              ...page,
+              data: page.data.filter((post: any) => post.id !== postId),
+            };
+          });
+          return { ...oldData, pages: filteredData };
+        } else {
+          queryClient.invalidateQueries({ queryKey: ["posts"] });
+        }
       });
     },
   });

@@ -29,20 +29,21 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [manualUser, setManualUser] = useState<User | null>(null);
   const logout = useLogout();
-  const { data: profileData, isLoading } = useProfile();
+  const { data: profileData, isLoading: isQueryLoading } = useProfile();
   const queryClient = useQueryClient();
+  const user = manualUser || profileData || null;
 
   useEffect(() => {
     if (profileData) {
-      setUser(profileData);
+      setManualUser(profileData);
     }
   }, [profileData]);
 
   const logoutHelper = async () => {
     await logout.mutateAsync();
-    setUser(null);
+    setManualUser(null);
     queryClient.clear();
   };
 
@@ -55,11 +56,15 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     return role.includes(user.role);
   };
+
+
+  const isLoading = isQueryLoading;
+
   return (
     <AuthContext.Provider
       value={{
         user,
-        setUser,
+        setUser: setManualUser,
         logoutHelper,
         hasRole,
         isLoading,

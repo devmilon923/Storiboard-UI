@@ -20,14 +20,14 @@ interface CommentSidebarProps {
   post: Post | null;
   isOpen: boolean;
   onClose: () => void;
-  initialCommentId?: string | number | null;
+  // initialCommentId?: string | number | null;
 }
 
 export const CommentSidebar: React.FC<CommentSidebarProps> = ({
   post,
   isOpen,
   onClose,
-  initialCommentId,
+  // initialCommentId,
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [replies, setReplies] = useState<Comment[]>([]);
@@ -85,9 +85,9 @@ export const CommentSidebar: React.FC<CommentSidebarProps> = ({
   ]);
   // Reset navigation state whenever the post changes or sidebar closes
   useEffect(() => {
-    setSelectedCommentId(initialCommentId || null);
+    setSelectedCommentId(null);
     setReplies([]);
-  }, [post?.id, isOpen, initialCommentId]);
+  }, [post?.id, isOpen]);
 
   // Sync main comments data
   useEffect(() => {

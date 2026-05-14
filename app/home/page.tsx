@@ -116,7 +116,10 @@ const HomePage: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <BookmarkPost isActive={activeTab === "save" ? true : false} />
+                <BookmarkPost
+                  isActive={activeTab === "save" ? true : false}
+                  onOpenComments={handleOpenComments}
+                />
               )}
             </div>
           </div>
@@ -128,7 +131,7 @@ const HomePage: React.FC = () => {
         post={selectedPost}
         isOpen={isSidebarOpen}
         onClose={handleCloseSidebar}
-        initialCommentId={initialCommentId}
+        // initialCommentId={initialCommentId}
       />
     </div>
   );

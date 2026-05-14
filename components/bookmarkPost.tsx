@@ -8,6 +8,7 @@ import {
   MoreHorizontal,
   BadgeCheck,
   Loader2,
+  Feather,
 } from "lucide-react";
 import {
   Card,
@@ -20,9 +21,16 @@ import moment from "moment";
 
 import { calculateReadTime } from "@/utils/helpers";
 import Image from "next/image";
-import { useGetAllSavePosts } from "@/utils/api/endpoints";
+import {
+  useAddLike,
+  useBookmarkAction,
+  useGetAllSavePosts,
+} from "@/utils/api/endpoints";
 import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { formatNumber, Post } from "./social-post-card";
+import { likeValidation } from "@/utils/api/validations";
+import z from "zod";
 
 interface BookmarkItem {
   id: number;
@@ -40,10 +48,48 @@ interface BookmarkItem {
     likesCount: number;
     commentsCount: number;
   };
+  isLiked: boolean;
 }
 
-function BookmarkCard({ item }: { item: BookmarkItem }) {
+function BookmarkCard({
+  item,
+  onOpenComments,
+}: {
+  item: BookmarkItem;
+  onOpenComments: (post: Post, commentId?: string | number) => void;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isLongText = item.post.content.length > 200;
+  const displayContent = isExpanded
+    ? item.post.content
+    : item.post.content.slice(0, 200) + (isLongText ? "..." : "");
   const readTime = calculateReadTime(item.post.content);
+  const [isBookmarked, setIsBookmarked] = useState(true);
+  const updateBookmarks = useBookmarkAction();
+  const [isLiked, setIsLiked] = useState(item.isLiked || false);
+  const addSavePostLike = useAddLike();
+  const handleBookmark = async (id: number) => {
+    try {
+      await updateBookmarks.mutateAsync(id);
+      setIsBookmarked(!isBookmarked);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlePostLike = async (data: z.infer<typeof likeValidation>) => {
+    try {
+      if (data) {
+        await addSavePostLike.mutateAsync(data);
+        setIsLiked(!isLiked);
+        item.post.likesCount = isLiked
+          ? item.post.likesCount - 1
+          : item.post.likesCount + 1;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Card className="group relative overflow-hidden bg-card/40 border-border/40 hover:border-primary/20 transition-all duration-300 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 rounded-3xl">
@@ -70,9 +116,6 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
                 <BadgeCheck className="size-3.5 fill-primary text-primary-foreground" />
               )}
             </div>
-            <Button variant="ghost" size="icon" className="size-8 rounded-full">
-              <MoreHorizontal className="size-4 text-muted-foreground" />
-            </Button>
           </div>
 
           <div className="flex items-center gap-y-1 gap-x-2 text-[11px] font-medium text-muted-foreground/60 flex-wrap">
@@ -101,8 +144,21 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
 
       <CardContent className="px-5 pb-4 pt-0">
         <p className="text-[14px] leading-relaxed text-foreground/80 whitespace-pre-wrap">
-          {item.post.content}
+          {displayContent}
         </p>
+        {isLongText && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="mt-3 flex items-center gap-2 text-[13px] font-bold text-primary hover:text-primary/80 cursor-pointer transition-all hover:gap-3 group/read"
+          >
+            <span className="underline decoration-primary/30 underline-offset-4 group-hover/read:decoration-primary">
+              {isExpanded ? "Close story" : "Continue reading"}
+            </span>
+            <Feather
+              className={`size-3.5 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+            />
+          </button>
+        )}
       </CardContent>
 
       <CardFooter className="flex items-center justify-between gap-2 border-t border-border/10 bg-muted/5 p-2 px-4">
@@ -110,22 +166,37 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 gap-1.5 rounded-full px-3 text-muted-foreground hover:text-primary hover:bg-primary/5"
+            onClick={() =>
+              handlePostLike({
+                likeType: "post",
+                sourceId: Number(item.post.id),
+              })
+            }
+            className={`h-8 gap-1.5 rounded-full px-3 transition-all duration-300 ${
+              isLiked
+                ? "text-primary bg-primary/10"
+                : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+            }`}
           >
-            <Heart className="size-4" />
+            <Heart
+              className={`size-4 transition-transform duration-300 ${
+                isLiked ? "fill-primary scale-110" : ""
+              }`}
+            />
             <span className="text-[11px] font-bold">
-              {item.post.likesCount}
+              {formatNumber(item.post.likesCount)}
             </span>
           </Button>
 
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 gap-1.5 rounded-full px-3 text-muted-foreground hover:text-primary hover:bg-primary/5"
+            onClick={() => onOpenComments(item.post as Post)}
+            className="h-8 gap-1.5 rounded-full px-3 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300"
           >
             <MessageCircle className="size-4" />
             <span className="text-[11px] font-bold">
-              {item.post.commentsCount}
+              {formatNumber(item.post.commentsCount)}
             </span>
           </Button>
 
@@ -141,16 +212,29 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
         <Button
           variant="ghost"
           size="icon"
-          className="size-8 rounded-full text-primary bg-primary/10"
+          onClick={() => handleBookmark(+item.post.id)}
+          className={`size-8 rounded-full transition-all duration-300 ${
+            isBookmarked
+              ? "text-primary bg-primary/10 shadow-inner"
+              : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+          }`}
         >
-          <Bookmark className="size-4 fill-primary" />
+          <Bookmark
+            className={`size-4 transition-all duration-500 ${isBookmarked ? "fill-primary scale-110" : ""}`}
+          />
         </Button>
       </CardFooter>
     </Card>
   );
 }
 
-function BookmarkPost({ isActive }: { isActive: boolean }) {
+function BookmarkPost({
+  isActive,
+  onOpenComments,
+}: {
+  isActive: boolean;
+  onOpenComments: (post: Post, commentId?: string | number) => void;
+}) {
   const { ref, inView } = useInView({ threshold: 1, delay: 100 });
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetAllSavePosts(10, isActive);
@@ -186,18 +270,17 @@ function BookmarkPost({ isActive }: { isActive: boolean }) {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-2xl font-bold text-foreground">Saved Posts</h3>
-          <p className="text-sm text-muted-foreground">
-            {bookmarks.length} posts in your library
-          </p>
+          <p className="text-sm text-muted-foreground">in your library</p>
         </div>
-        <Button variant="outline" size="sm" className="rounded-full font-bold">
-          View All
-        </Button>
       </div>
 
       <div className="flex flex-col gap-4">
         {bookmarks.map((bookmark) => (
-          <BookmarkCard key={bookmark.id} item={bookmark} />
+          <BookmarkCard
+            key={bookmark.id}
+            item={bookmark}
+            onOpenComments={onOpenComments}
+          />
         ))}
         <div ref={ref} className="py-8 flex justify-center">
           {isFetchingNextPage ? (

@@ -74,7 +74,10 @@ interface SocialPostCardProps {
   className?: string;
   onOpenComments?: (commentId?: string | number) => void;
 }
-
+export const formatNumber = (num: number) => {
+  if (num >= 1000) return (num / 1000).toFixed(1) + "k";
+  return num;
+};
 export const SocialPostCard: React.FC<SocialPostCardProps> = ({
   post,
   onOpenComments,
@@ -120,6 +123,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
       console.log(error);
     }
   };
+
   const handlePostLike = async (data: z.infer<typeof likeValidation>) => {
     try {
       if (data) {
@@ -131,10 +135,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
       console.log(error);
     }
   };
-  const formatNumber = (num: number) => {
-    if (num >= 1000) return (num / 1000).toFixed(1) + "k";
-    return num;
-  };
+
   const handleBookmark = async (postId: number) => {
     console.log(postId);
     try {

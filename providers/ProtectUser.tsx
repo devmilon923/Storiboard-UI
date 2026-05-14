@@ -25,13 +25,14 @@ export default function ProtectUserRoute({
     }
   }, [isLoading, user, router, isMounted]);
 
-  if (!isMounted) return null;
-
-  if (isLoading && !user) {
+  if (!isMounted || (isLoading && !user)) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
-        <div className="animate-pulse text-sm font-medium text-muted-foreground">
-          Loading...
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          <div className="animate-pulse text-sm font-medium text-muted-foreground">
+            Restoring session...
+          </div>
         </div>
       </div>
     );
