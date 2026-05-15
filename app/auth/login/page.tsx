@@ -43,8 +43,8 @@ export default function LoginPage() {
         password: data.password,
       });
       setUser(result.data);
-    } catch (error) {
-      console.error("Login failed", error);
+    } catch (error: any) {
+      console.log("Login failed", error.response.data.message);
     }
   }
 
