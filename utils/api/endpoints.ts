@@ -329,3 +329,19 @@ export const useGetAllSavePosts = (limit: number, isActive: boolean) => {
     retry: false,
   });
 };
+
+export const useGetAllNotifications = (limit: number = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["notification", { limit }],
+    queryFn: async ({ pageParam = 0 }) => {
+      const result = await api.get(
+        `/notification?limit=${limit}&pc=${pageParam}`,
+      );
+      return result.data;
+    },
+    getNextPageParam: (lastPage) => lastPage?.cursor,
+    initialPageParam: 0,
+    enabled: typeof window !== "undefined",
+    retry: false,
+  });
+};
