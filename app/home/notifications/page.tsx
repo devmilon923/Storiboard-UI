@@ -5,23 +5,22 @@ import {
   Heart, 
   MessageCircle, 
   UserPlus, 
-  AtSign, 
   Bell,
   Clock,
   ChevronRight,
   BadgeCheck
 } from "lucide-react";
 import moment from "moment";
-import { cn } from "@/lib/utils";
 import { Card, CardHeader } from "@/components/ui/card";
 
 // Dummy Notification Types based on updated schema
 type NotificationType = 
   | "LIKE_ON_POST" 
+  | "LIKE_ON_COMMENT"
   | "COMMENT_ON_POST" 
-  | "FOLLOW" 
-  | "MENTION" 
-  | "SYSTEM";
+  | "REPLIE_ON_COMMENT"
+  | "REPLIE_ON_REPLIE"
+  | "FOLLOW";
 
 interface User {
   id: number;
@@ -32,8 +31,6 @@ interface User {
 
 interface Notification {
   id: number;
-  senderId: number;
-  receiverId: number;
   sender: User;
   receiver: User;
   title: string;
@@ -46,8 +43,6 @@ interface Notification {
 const DUMMY_NOTIFICATIONS: Notification[] = [
   {
     id: 1,
-    senderId: 101,
-    receiverId: 1,
     sender: {
       id: 101,
       name: "Alex Johnson",
@@ -63,8 +58,6 @@ const DUMMY_NOTIFICATIONS: Notification[] = [
   },
   {
     id: 2,
-    senderId: 102,
-    receiverId: 1,
     sender: {
       id: 102,
       name: "Sarah Chen",
@@ -79,8 +72,6 @@ const DUMMY_NOTIFICATIONS: Notification[] = [
   },
   {
     id: 3,
-    senderId: 103,
-    receiverId: 1,
     sender: {
       id: 103,
       name: "David Smith",
@@ -95,19 +86,31 @@ const DUMMY_NOTIFICATIONS: Notification[] = [
   },
   {
     id: 4,
-    senderId: 104,
-    receiverId: 1,
     sender: {
       id: 104,
-      name: "Tech News",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=System",
+      name: "John Doe",
+      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
       isVerifyed: true
     },
     receiver: { id: 1, name: "Me", image: "" },
-    title: "Tech News mentioned you in a post",
-    ref: "/posts/789",
-    notiType: "MENTION",
-    createdAt: moment().subtract(2, "days").toISOString(),
+    title: "John Doe replied to your comment",
+    ref: "/video/123#comment-789",
+    notiType: "REPLIE_ON_COMMENT",
+    createdAt: moment().subtract(3, "hours").toISOString(),
+    updatedAt: moment().toISOString(),
+  },
+  {
+    id: 5,
+    sender: {
+      id: 105,
+      name: "Emily White",
+      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emily",
+    },
+    receiver: { id: 1, name: "Me", image: "" },
+    title: "Emily White liked your comment",
+    ref: "/video/123#comment-456",
+    notiType: "LIKE_ON_COMMENT",
+    createdAt: moment().subtract(4, "hours").toISOString(),
     updatedAt: moment().toISOString(),
   },
 ];
@@ -115,15 +118,14 @@ const DUMMY_NOTIFICATIONS: Notification[] = [
 const NotificationIcon = ({ type }: { type: NotificationType }) => {
   switch (type) {
     case "LIKE_ON_POST":
+    case "LIKE_ON_COMMENT":
       return <Heart className="size-3.5 fill-rose-500 text-rose-500" />;
     case "COMMENT_ON_POST":
+    case "REPLIE_ON_COMMENT":
+    case "REPLIE_ON_REPLIE":
       return <MessageCircle className="size-3.5 fill-blue-500/20 text-blue-500" />;
     case "FOLLOW":
       return <UserPlus className="size-3.5 text-emerald-500" />;
-    case "MENTION":
-      return <AtSign className="size-3.5 text-amber-500" />;
-    case "SYSTEM":
-      return <Bell className="size-3.5 text-purple-500" />;
     default:
       return <Bell className="size-3.5 text-gray-500" />;
   }
