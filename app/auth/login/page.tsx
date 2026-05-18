@@ -8,6 +8,7 @@ import { useLoginUser } from "@/utils/api/endpoints";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import z from "zod";
 import { useAuth } from "@/providers/AuthContext";
 import { Loader2 } from "lucide-react";
@@ -176,6 +177,18 @@ export default function LoginPage() {
             )}
           </Button>
         </form>
+
+        <div className="text-center mt-6">
+          <p className="text-sm text-muted-foreground">
+            New to Storiboard?{" "}
+            <Link
+              href="/auth/register"
+              className="font-bold text-primary hover:underline transition-all cursor-pointer"
+            >
+              Create an Account
+            </Link>
+          </p>
+        </div>
 
         <p className="mt-8 text-center text-xs text-muted-foreground leading-relaxed">
           By continuing you agree to our{" "}

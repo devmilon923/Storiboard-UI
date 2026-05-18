@@ -479,8 +479,8 @@ function RegisterPage() {
                       Verification Code
                     </h3>
                     <p className="text-sm text-muted-foreground mt-2 max-w-[260px] mx-auto leading-relaxed">
-                      We've sent a 6-digit secure code to your email. Enter it
-                      below to continue.
+                      We've sent a 6-digit Storiboard verification code to your
+                      email. Enter it below to continue.
                     </p>
                   </div>
                 </div>
@@ -550,7 +550,7 @@ function RegisterPage() {
 
                   <div className="space-y-2">
                     <h2 className="text-3xl font-extrabold text-foreground tracking-tight">
-                      Welcome aboard!
+                      Welcome to Storiboard!
                     </h2>
                     <p className="text-muted-foreground font-medium">
                       Your account has been successfully verified

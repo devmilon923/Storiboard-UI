@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import ProtectGestRoute from "@/providers/ProtectGest";
 
 export const metadata: Metadata = {
-  title: "Storiboard - Sign In",
-  description: "Sign in to your Storiboard account to continue writing and sharing stories.",
+  title: "Storiboard - Sign Up",
+  description: "Create your Storiboard account to start publishing stories and connecting with creators.",
 };
 
-export default function AuthLayout({
+export default function RegisterLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

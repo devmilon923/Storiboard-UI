@@ -3,8 +3,8 @@ import ProtectUserRoute from "@/providers/ProtectUser";
 import { HomeNavbar } from "@/components/home-navbar";
 
 export const metadata: Metadata = {
-  title: "Home",
-  description: "Home page",
+  title: "Storiboard - Feed",
+  description: "Trending posts feed",
 };
 
 export default function UserLayout({

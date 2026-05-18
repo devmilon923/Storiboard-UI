@@ -85,7 +85,7 @@ export default function Page() {
               <Feather size={16} className="text-primary group-hover:text-primary-foreground transition-colors" />
             </div>
             <span className="text-[17px] font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors">
-              Storytell
+              Storiboard
             </span>
           </Link>
 
@@ -474,7 +474,7 @@ export default function Page() {
       {/* ─── Footer ─── */}
       <footer className="relative z-10 border-t border-border/30 py-5">
         <p className="text-center text-xs text-muted-foreground/50">
-          Storytell — Share your imagination with the world.
+          Storiboard — Share your imagination with the world.
         </p>
       </footer>
     </div>
