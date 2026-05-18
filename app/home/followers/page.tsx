@@ -23,7 +23,7 @@ import { useInView } from "react-intersection-observer";
 const FILTER_PROFESSIONS = [
   "All",
   "Verified",
-  "Design",
+  "Doctor",
   "Engineering",
   "Product",
   "Creator",
@@ -38,7 +38,11 @@ function FollowersPage() {
   const [followState, setFollowState] = useState<Record<string, boolean>>({});
   const { ref, inView } = useInView();
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useGetAllFollowers();
+    useGetAllFollowers(
+      10,
+      selectedProfession === "All" ? "" : selectedProfession,
+      searchQuery,
+    );
 
   const finalData = useMemo(() => {
     return data?.pages.flatMap((page) => page.data || []) || [];
@@ -47,7 +51,14 @@ function FollowersPage() {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, fetchNextPage, isFetchingNextPage]);
+  }, [
+    inView,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    searchQuery,
+    selectedProfession,
+  ]);
   useEffect(() => {
     if (!finalData.length) return;
     const initialState: Record<string, boolean> = {};

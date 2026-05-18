@@ -345,12 +345,16 @@ export const useGetAllNotifications = (limit: number = 10) => {
     retry: false,
   });
 };
-export const useGetAllFollowers = (limit: number = 10) => {
+export const useGetAllFollowers = (
+  limit: number = 10,
+  profession: string,
+  searchQ: string,
+) => {
   return useInfiniteQuery({
-    queryKey: ["followers", { limit }],
+    queryKey: ["followers", { limit, searchQ, profession }],
     queryFn: async ({ pageParam }) => {
       const result = await api.get(
-        `/user/followers?limit=${limit}&pc=${pageParam}`,
+        `/user/followers?limit=${limit}&pc=${pageParam}&searchQ=${searchQ}&profession=${profession}`,
       );
       return result.data;
     },
