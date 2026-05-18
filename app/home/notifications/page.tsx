@@ -73,7 +73,7 @@ export default function NotificationsPage() {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
+    <div className="max-w-2xl mx-auto py-8 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">

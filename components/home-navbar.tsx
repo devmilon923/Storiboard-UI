@@ -10,7 +10,7 @@ import { useState, useRef, useEffect } from "react";
 
 const NAV_ITEMS = [
   {
-    label: "Feed",
+    label: "Home",
     href: "/home",
     icon: Home,
   },
@@ -20,8 +20,8 @@ const NAV_ITEMS = [
     icon: Bell,
   },
   {
-    label: "Friends",
-    href: "/home/friends",
+    label: "Followers",
+    href: "/home/followers",
     icon: Users,
   },
   {
@@ -53,14 +53,14 @@ export const HomeNavbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-40 w-full border-b border-border/50 py-0.5 bg-background/80 backdrop-blur-md">
       <div className="mx-auto max-w-2xl px-4">
-        <div className="flex h-14 items-center">
+        <div className="flex h-14 items-center gap-1">
           {NAV_ITEMS.map((item, index) => {
             const isProfile = "isProfile" in item && item.isProfile;
             const href =
               ("href" in item ? item.href : "/home/profile") || "/home/profile";
-            const label = "label" in item ? item.label : "";
+            const label = "label" in item ? item.label : "Profile";
             const isActive = pathname === href;
             const Icon = item.icon;
 
@@ -68,52 +68,56 @@ export const HomeNavbar = () => {
               return (
                 <div
                   key={index}
-                  className="relative flex flex-1 flex-col items-center justify-center h-full"
+                  className="relative flex flex-1 items-center justify-center h-full"
                   ref={menuRef}
                 >
                   <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className={cn(
-                      "relative flex flex-col items-center justify-center w-full h-full transition-colors group outline-none",
-                      isActive
-                        ? "text-primary"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
+                    className="relative flex flex-col items-center justify-center outline-none group w-full"
                   >
-                    <div className="relative">
-                      <div
-                        className={cn(
-                          "relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-secondary text-[10px] font-bold text-secondary-foreground uppercase overflow-hidden border-2 border-background shadow-sm ring-1 ring-border transition-all duration-300 group-hover:ring-primary/50 group-hover:shadow-md",
-                          isActive &&
-                            "ring-primary shadow-primary/20 shadow-md",
-                        )}
-                      >
-                        {user.image ? (
-                          <Image
-                            src={user.image}
-                            alt={user.name}
-                            width={100}
-                            height={100}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary font-bold">
-                            {user.name?.charAt(0) || "U"}
-                          </div>
-                        )}
+                    <div
+                      className={cn(
+                        "flex flex-col items-center justify-center py-1 px-3 sm:px-5 rounded-2xl transition-all duration-300 gap-0.5 cursor-pointer w-fit",
+                        isActive
+                          ? "bg-primary/10 text-primary font-bold"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/40",
+                      )}
+                    >
+                      <div className="relative">
+                        <div
+                          className={cn(
+                            "relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-secondary text-[10px] font-bold text-secondary-foreground uppercase overflow-hidden border-2 border-background shadow-sm ring-1 ring-border transition-all duration-300 group-hover:ring-primary/50 group-hover:shadow-md",
+                            isActive &&
+                              "ring-primary shadow-primary/20 shadow-md",
+                          )}
+                        >
+                          {user.image ? (
+                            <Image
+                              src={user.image}
+                              alt={user.name}
+                              width={100}
+                              height={100}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary font-bold">
+                              {user.name?.charAt(0) || "U"}
+                            </div>
+                          )}
+                        </div>
+                        {/* Status Indicator */}
+                        <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-500 shadow-sm" />
                       </div>
-                      {/* Status Indicator */}
-                      <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-500 shadow-sm" />
-                    </div>
 
-                    {isActive && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-primary" />
-                    )}
+                      <span className="hidden sm:block text-[10px] font-bold tracking-wide">
+                        {label}
+                      </span>
+                    </div>
                   </button>
 
                   {/* Dropdown Menu */}
                   {isMenuOpen && (
-                    <div className="absolute top-full mt-3 right-0 min-w-[220px] overflow-hidden rounded-2xl border border-border bg-background/95 p-1.5 shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-200 ease-out">
+                    <div className="absolute top-full mt-2 right-0 min-w-[220px] overflow-hidden rounded-2xl border border-border bg-background/95 p-1.5 shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-200 ease-out z-50">
                       <div className="px-3 py-3 mb-1 border-b border-border/50">
                         <div className="flex items-center gap-3">
                           <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase overflow-hidden border border-border/50">
@@ -185,33 +189,33 @@ export const HomeNavbar = () => {
               <Link
                 key={href}
                 href={href}
-                className={cn(
-                  "relative flex flex-1 flex-col items-center justify-center h-full transition-colors group",
-                  isActive
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
+                className="relative flex flex-1 items-center justify-center h-full transition-all duration-300 group"
               >
-                <div className="relative">
-                  <Icon
-                    className={cn(
-                      "size-5.5 transition-transform duration-200 group-active:scale-90",
-                      isActive && "fill-primary/10",
-                    )}
-                  />
-
-                  {label === "Notifications" && (
-                    <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2 rounded-full bg-rose-500 ring-2 ring-background" />
+                <div
+                  className={cn(
+                    "flex flex-col items-center justify-center py-1 px-3 sm:px-5 rounded-2xl transition-all duration-300 gap-0.5 cursor-pointer w-fit",
+                    isActive
+                      ? "bg-primary/10 text-primary font-bold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/40",
                   )}
+                >
+                  <div className="relative">
+                    <Icon
+                      className={cn(
+                        "size-5 transition-transform duration-200 group-active:scale-95",
+                        isActive && "fill-primary/10",
+                      )}
+                    />
+
+                    {label === "Notifications" && (
+                      <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2 rounded-full bg-rose-500 ring-2 ring-background animate-pulse" />
+                    )}
+                  </div>
+
+                  <span className="hidden sm:block text-[10px] font-bold tracking-wide">
+                    {label}
+                  </span>
                 </div>
-
-                <span className="hidden sm:block mt-1 text-[0.65rem] font-medium tracking-wide">
-                  {label}
-                </span>
-
-                {isActive && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-primary" />
-                )}
               </Link>
             );
           })}

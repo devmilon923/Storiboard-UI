@@ -80,7 +80,7 @@
   --sidebar-accent-foreground: oklch(0.3 0.04 42);
   --sidebar-border: oklch(0.9 0.01 90);
   --sidebar-ring: oklch(0.65 0.15 65);
-  overflow-y: scroll;
+  overflow-y: hidden;
 }
 
 .dark {

@@ -53,10 +53,10 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="flex h-[calc(100vh-64px)] w-full overflow-hidden bg-background">
+    <div className="flex h-[calc(100vh-64px)] w-full bg-background">
       {/* Main Feed Section */}
-      <div className="flex-1 overflow-y-auto overscroll-contain">
-        <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
+      <div className="flex-1 ">
+        <div className="max-w-2xl mx-auto px-4 py-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <CreatePost />
 
           <div className="space-y-6">
