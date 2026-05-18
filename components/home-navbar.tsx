@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Bell, Users, User, Settings, LogOut } from "lucide-react";
+import {
+  Home,
+  Bell,
+  Users,
+  User,
+  Settings,
+  LogOut,
+  MessageCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/AuthContext";
 import Image from "next/image";
@@ -13,6 +21,11 @@ const NAV_ITEMS = [
     label: "Home",
     href: "/home",
     icon: Home,
+  },
+  {
+    label: "Messages",
+    href: "/home/messages",
+    icon: MessageCircle,
   },
   {
     label: "Notifications",
@@ -53,9 +66,9 @@ export const HomeNavbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-40 w-full border-b border-border/50 py-0.5 bg-background/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-40 w-full border-b border-border/50 py-1 bg-background/80 backdrop-blur-md">
       <div className="mx-auto max-w-2xl px-4">
-        <div className="flex h-14 items-center gap-1">
+        <div className="flex h-12 items-center justify-between gap-1">
           {NAV_ITEMS.map((item, index) => {
             const isProfile = "isProfile" in item && item.isProfile;
             const href =
@@ -73,20 +86,21 @@ export const HomeNavbar = () => {
                 >
                   <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="relative flex flex-col items-center justify-center outline-none group w-full"
+                    className="relative flex items-center justify-center outline-none group"
+                    title="Profile Menu"
                   >
                     <div
                       className={cn(
-                        "flex flex-col items-center justify-center py-1 px-3 sm:px-5 rounded-2xl transition-all duration-300 gap-0.5 cursor-pointer w-fit",
+                        "flex items-center justify-center p-2 rounded-2xl transition-all duration-300 cursor-pointer",
                         isActive
-                          ? "bg-primary/10 text-primary font-bold"
+                          ? "bg-primary/10 text-primary"
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/40",
                       )}
                     >
                       <div className="relative">
                         <div
                           className={cn(
-                            "relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-secondary text-[10px] font-bold text-secondary-foreground uppercase overflow-hidden border-2 border-background shadow-sm ring-1 ring-border transition-all duration-300 group-hover:ring-primary/50 group-hover:shadow-md",
+                            "relative flex h-7.5 w-7.5 cursor-pointer items-center justify-center rounded-full bg-secondary overflow-hidden border-2 border-background shadow-sm ring-1 ring-border transition-all duration-300 group-hover:ring-primary/50 group-hover:shadow-md",
                             isActive &&
                               "ring-primary shadow-primary/20 shadow-md",
                           )}
@@ -100,7 +114,7 @@ export const HomeNavbar = () => {
                               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                             />
                           ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary font-bold">
+                            <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary font-bold text-xs">
                               {user.name?.charAt(0) || "U"}
                             </div>
                           )}
@@ -108,10 +122,6 @@ export const HomeNavbar = () => {
                         {/* Status Indicator */}
                         <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-500 shadow-sm" />
                       </div>
-
-                      <span className="hidden sm:block text-[10px] font-bold tracking-wide">
-                        {label}
-                      </span>
                     </div>
                   </button>
 
@@ -190,31 +200,28 @@ export const HomeNavbar = () => {
                 key={href}
                 href={href}
                 className="relative flex flex-1 items-center justify-center h-full transition-all duration-300 group"
+                title={label}
               >
                 <div
                   className={cn(
-                    "flex flex-col items-center justify-center py-1 px-3 sm:px-5 rounded-2xl transition-all duration-300 gap-0.5 cursor-pointer w-fit",
+                    "flex items-center justify-center p-2 rounded-2xl transition-all duration-300 cursor-pointer",
                     isActive
-                      ? "bg-primary/10 text-primary font-bold"
+                      ? "bg-primary/10 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/40",
                   )}
                 >
                   <div className="relative">
                     <Icon
                       className={cn(
-                        "size-5 transition-transform duration-200 group-active:scale-95",
+                        "size-6 transition-transform duration-200 group-active:scale-95",
                         isActive && "fill-primary/10",
                       )}
                     />
 
-                    {label === "Notifications" && (
+                    {href === "/home/notifications" && (
                       <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2 rounded-full bg-rose-500 ring-2 ring-background animate-pulse" />
                     )}
                   </div>
-
-                  <span className="hidden sm:block text-[10px] font-bold tracking-wide">
-                    {label}
-                  </span>
                 </div>
               </Link>
             );
