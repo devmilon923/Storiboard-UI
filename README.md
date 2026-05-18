@@ -12,34 +12,6 @@ Whether you're looking to publish rich stories, connect with an audience through
 
 ---
 
-## ✨ Features
-
-- 🔐 **Secure JWT-Based Authentication**: Seamless registration, login, and protected routing powered by `jose` and persistent client-side cookies.
-- ✍️ **Advanced Rich Text Editors**: Draft beautiful stories using **TipTap** and **Quill** integration, supporting nested elements, rich formatting, and custom media.
-- ⚡ **Dynamic Trending Feed**: Live feed utilizing infinite scroll pagination (via `@tanstack/react-query` and `react-intersection-observer`) with loading skeletons and end-of-feed markers.
-- 💬 **Interactive Comments Sidebar**: Drop-in comment panel featuring real-time feedback, interactive replies, and fluid open/close animations.
-- 🔖 **Post Bookmarking & Saving**: Seamless tabbed navigation between "Trending" feed and "Saved Posts" to bookmark posts for later reading.
-- 🔔 **Interactive Notification Center**: Beautifully designed social post card styles featuring rich event logging (likes, comments, follows) built using custom Prisma schemas.
-- 👥 **Followers System**: Seamlessly follow other creators, view profiles, and build a dedicated community of readers.
-- 🌓 **Ambient Dark & Light Mode**: Sleek dark mode with colorful glassmorphic blur overlays, customized harmonies, and subtle micro-animations (via `tw-animate-css`).
-
----
-
-## 🛠️ Technology Stack
-
-| Category | Technology / Library | Description |
-| :--- | :--- | :--- |
-| **Core Framework** | **Next.js 16 (App Router)** & **React 19** | Edge-ready server components and cutting-edge rendering. |
-| **Styling & UI** | **Tailwind CSS v4** & **Radix UI** | Modern utility-first CSS styling paired with unstyled, accessible primitives. |
-| **Icons & Visuals** | **Lucide React** | Sleek, clean SVG icons matching premium aesthetics. |
-| **State & Data** | **TanStack Query (v5)** & **Axios** | High-performance asynchronous state synchronization and API fetching. |
-| **Rich Editing** | **TipTap** & **Quill** | Fully customizable headless rich text editors. |
-| **Media Uploads** | **Next-Cloudinary** | Fast, high-performance image uploads and CDN-based delivery. |
-| **Authentication** | **Jose** & **Next-Client-Cookies** | Lightweight, browser-compatible JSON Web Token (JWT) handling and cookie storage. |
-| **Form Control** | **React Hook Form** & **Zod** | Strictly-typed form states and schema-based runtime validation. |
-
----
-
 ## 📁 Directory Structure
 
 ```text
