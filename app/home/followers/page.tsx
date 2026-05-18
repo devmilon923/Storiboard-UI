@@ -193,7 +193,6 @@ function FollowersPage() {
     <div className="flex h-[calc(100vh-64px)] w-full  bg-background">
       <div className="flex-1 ">
         <div className="max-w-2xl mx-auto px-4 py-6 sm:py-8 space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {/* Elegant Responsive Page Header */}
           <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border/40">
             <div className="space-y-1">
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1 text-foreground">
@@ -215,7 +214,7 @@ function FollowersPage() {
                   Total
                 </div>
               </div>
-              <div className="w-[1px] bg-border/40 self-stretch" />
+              <div className="w-px bg-border/40 self-stretch" />
               <div className="text-center flex-1 md:flex-initial min-w-[65px] sm:min-w-[75px]">
                 <div className="text-base sm:text-lg font-extrabold text-primary flex items-center justify-center gap-0.5">
                   {stats.verified}
