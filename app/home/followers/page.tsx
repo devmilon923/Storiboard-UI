@@ -13,12 +13,14 @@ import {
   X,
   ShieldCheck,
   Briefcase,
+  UserCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useGetAllFollowers } from "@/utils/api/endpoints";
+import { useFollowerAction, useGetAllFollowers } from "@/utils/api/endpoints";
 import { useInView } from "react-intersection-observer";
+import { useDebounce } from "@/app/hooks/debounce";
 
 const FILTER_PROFESSIONS = [
   "All",
@@ -37,11 +39,13 @@ function FollowersPage() {
   const [selectedUserForMessage, setSelectedUserForMessage] = useState("");
   const [followState, setFollowState] = useState<Record<string, boolean>>({});
   const { ref, inView } = useInView();
+  const followAction = useFollowerAction();
+  const debounceSearch = useDebounce(searchQuery, 700);
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useGetAllFollowers(
       10,
       selectedProfession === "All" ? "" : selectedProfession,
-      searchQuery,
+      debounceSearch,
     );
 
   const finalData = useMemo(() => {
@@ -56,7 +60,7 @@ function FollowersPage() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-    searchQuery,
+    debounceSearch,
     selectedProfession,
   ]);
   useEffect(() => {
@@ -74,11 +78,16 @@ function FollowersPage() {
     return num;
   };
 
-  const handleFollowToggle = (id: string) => {
-    setFollowState((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+  const handleFollowToggle = async (id: number) => {
+    try {
+      await followAction.mutateAsync(id);
+      setFollowState((prev) => ({
+        ...prev,
+        [id]: !prev[id],
+      }));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const stats = useMemo(() => {
@@ -255,28 +264,23 @@ function FollowersPage() {
                     <Button
                       onClick={() => handleFollowToggle(follower.followerId)}
                       variant={
-                        followState[follower.followerId]
-                          ? "destructive"
-                          : "outline"
+                        followState[follower.followerId] ? "outline" : "default"
                       }
                       size="sm"
-                      className={`h-7 sm:h-8 font-bold rounded-full text-[11px] sm:text-xs transition-all duration-300 px-3.5 sm:px-4 group/btn ${
+                      className={`h-7 px-4 cursor-pointer font-bold rounded-full text-[10px] transition-all duration-300 shrink-0 ${
                         followState[follower.followerId]
-                          ? "bg-destructive/10 text-destructive border-transparent hover:bg-destructive hover:text-white active:scale-95"
-                          : "bg-primary text-primary-foreground border-transparent hover:bg-primary/95 hover:text-white hover:shadow-lg shadow-primary/20 active:scale-95"
+                          ? "border-primary/20 hover:bg-primary/5 text-primary"
+                          : "bg-primary text-primary-foreground shadow-md shadow-primary/10 hover:shadow-primary/20"
                       }`}
                     >
                       {followState[follower.followerId] ? (
-                        <>
-                          <UserX className="size-3.5 mr-1 group-hover/btn:scale-110 transition-transform" />
-                          <span>Unfollow</span>
-                        </>
+                        <UserCheck className="size-3 mr-1" />
                       ) : (
-                        <>
-                          <UserPlus className="size-3.5 mr-1 group-hover/btn:scale-110 transition-transform" />
-                          <span>Follow</span>
-                        </>
+                        <UserPlus className="size-3 mr-1" />
                       )}
+                      {followState[follower.followerId]
+                        ? "Following"
+                        : "Follow"}
                     </Button>
                   </div>
                 </Card>
@@ -321,29 +325,62 @@ function FollowersPage() {
       </div>
 
       {/* Dev Modal */}
+      {/* Dev Modal */}
       {isDevModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
           <div
             className="absolute inset-0 cursor-pointer"
             onClick={() => setIsDevModalOpen(false)}
           />
+
           <Card className="relative w-full max-w-[90%] sm:max-w-sm overflow-hidden bg-card/85 border border-primary/20 backdrop-blur-xl rounded-3xl p-5 sm:p-6 shadow-2xl animate-in zoom-in-95 duration-300 z-10 text-center">
+            {/* Icon */}
             <div className="mx-auto size-12 sm:size-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-3 sm:mb-4 relative shadow-inner">
               <Sparkles className="size-6 sm:size-7 text-primary animate-pulse" />
             </div>
+
             <h3 className="text-base sm:text-lg font-black text-foreground">
-              Under Development
+              Message Options
             </h3>
+
             <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-              The direct messaging interface with{" "}
-              <strong className="text-primary">{selectedUserForMessage}</strong>{" "}
-              is currently under development. Stay tuned for updates!
+              You can try sending a direct message to{" "}
+              <strong className="text-primary">{selectedUserForMessage}</strong>
+              .
             </p>
-            <div className="mt-5 sm:mt-6 flex justify-center">
+
+            {/* Actions */}
+            <div className="mt-5 space-y-2">
+              <Button
+                disabled
+                variant="outline"
+                className="w-full h-9 rounded-full text-xs sm:text-sm font-bold opacity-60 cursor-not-allowed"
+              >
+                Send Message (Coming Soon)
+              </Button>
+              {/* Email contact (optional) */}
+              {(() => {
+                const user = finalData.find(
+                  (f: any) => f.name === selectedUserForMessage,
+                );
+
+                return user?.email ? (
+                  <a
+                    href={`mailto:${user.email}`}
+                    className="w-full inline-flex items-center justify-center h-9 rounded-full bg-primary text-primary-foreground font-bold text-xs sm:text-sm shadow-md hover:bg-primary/90 transition-all"
+                  >
+                    Contact via Email
+                  </a>
+                ) : null;
+              })()}
+
+              {/* Image message (future feature placeholder) */}
+
+              {/* Close */}
               <Button
                 onClick={() => setIsDevModalOpen(false)}
-                variant="premium"
-                className="h-8 font-bold rounded-full px-5 sm:px-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 cursor-pointer active:scale-[0.98] border border-primary/20 text-xs sm:text-sm"
+                variant="ghost"
+                className="w-full h-8 rounded-full text-xs sm:text-sm font-bold"
               >
                 Close
               </Button>
