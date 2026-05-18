@@ -58,27 +58,32 @@ Make sure you have [Node.js](https://nodejs.org/) (v18.x or higher) and [npm](ht
 ### ⚙️ Installation
 
 1. **Clone the Repository**:
+
    ```bash
    git clone https://github.com/devmilon923/Resume-Builder-UI.git
    cd youtube
    ```
 
 2. **Install Dependencies**:
+
    ```bash
    npm install
    ```
 
 3. **Configure Environment Variables**:
    Create a `.env.local` file in the root directory and configure the environment variables:
+
    ```env
    NEXT_PUBLIC_API_URL=your_backend_api_url
    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloudinary_name
    ```
 
 4. **Run the Development Server**:
+
    ```bash
    npm run dev
    ```
+
    Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
 5. **Build for Production**:

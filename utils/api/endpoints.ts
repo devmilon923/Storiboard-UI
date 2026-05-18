@@ -345,3 +345,18 @@ export const useGetAllNotifications = (limit: number = 10) => {
     retry: false,
   });
 };
+export const useGetAllFollowers = (limit: number = 10) => {
+  return useInfiniteQuery({
+    queryKey: ["followers", { limit }],
+    queryFn: async ({ pageParam }) => {
+      const result = await api.get(
+        `/user/followers?limit=${limit}&pc=${pageParam}`,
+      );
+      return result.data;
+    },
+    getNextPageParam: (lastPage) => lastPage?.cursor,
+    initialPageParam: 0,
+    enabled: typeof window !== "undefined",
+    retry: false,
+  });
+};
