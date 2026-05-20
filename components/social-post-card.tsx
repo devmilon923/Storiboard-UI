@@ -244,9 +244,12 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
 
       <CardContent className="px-5 pb-4 pt-0 min-w-0">
         <div
-          className="text-[14px] leading-relaxed text-foreground/80 whitespace-pre-wrap wrap-break-word overflow-hidden [&>p]:mb-2 [&>ul]:list-disc [&>ol]:list-decimal [&>ul]:ml-4 [&>ol]:ml-4"
+          className="text-[14px] leading-relaxed text-foreground/80 whitespace-pre-wrap wrap-break-word overflow-hidden [&>p]:mb-2 [&>ul]:list-disc [&>ol]:list-decimal [&>ul]:ml-4 [&>ol]:ml-4 prose"
           dangerouslySetInnerHTML={{
-            __html: typeof window !== "undefined" ? DOMPurify.sanitize(displayContent) : displayContent
+            __html:
+              typeof window !== "undefined"
+                ? DOMPurify.sanitize(displayContent)
+                : displayContent,
           }}
         />
         {isLongText && (

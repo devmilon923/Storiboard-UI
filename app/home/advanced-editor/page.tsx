@@ -11,9 +11,10 @@ import {
   Send,
   Smile,
   X,
-  Sparkles,
   BaselineIcon,
   Heading1,
+  Heading3,
+  Heading2,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -47,7 +48,13 @@ export default function AdvancedEditorPage() {
   } | null>(null);
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3], // Specify allowed heading levels
+        },
+      }),
+    ],
 
     content: "",
     onUpdate: ({ editor }) => {
@@ -56,7 +63,7 @@ export default function AdvancedEditorPage() {
     editorProps: {
       attributes: {
         class:
-          "w-full min-h-[100px] resize-none outline-none bg-transparent py-2 text-[1rem] focus-visible:ring-0",
+          "w-full min-h-[100px] prose resize-none outline-none bg-transparent py-2 text-[1rem] focus-visible:ring-0",
       },
     },
   });
@@ -66,6 +73,9 @@ export default function AdvancedEditorPage() {
     selector: ({ editor }) => ({
       bold: editor?.isActive("bold"),
       italic: editor?.isActive("italic"),
+      h1: editor?.isActive("heading", { level: 1 }),
+      h2: editor?.isActive("heading", { level: 2 }),
+      h3: editor?.isActive("heading", { level: 3 }),
     }),
   });
 
@@ -142,7 +152,33 @@ export default function AdvancedEditorPage() {
                   >
                     <Bold size={16} />
                   </button>
-
+                  <button
+                    type="button"
+                    onClick={() =>
+                      editor.chain().focus().toggleHeading({ level: 1 }).run()
+                    }
+                    className={toolbarButton(editorState.h1)}
+                  >
+                    <Heading1 size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      editor.chain().focus().toggleHeading({ level: 2 }).run()
+                    }
+                    className={toolbarButton(editorState.h2)}
+                  >
+                    <Heading2 size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      editor.chain().focus().toggleHeading({ level: 3 }).run()
+                    }
+                    className={toolbarButton(editorState.h3)}
+                  >
+                    <Heading3 size={16} />
+                  </button>
                   <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -153,7 +189,7 @@ export default function AdvancedEditorPage() {
                 </div>
 
                 {/* Editor */}
-                <div className="relative">
+                <div className="relative ">
                   {!content.trim() && (
                     <div className="absolute top-2 left-0 text-[1rem] text-muted-foreground/60 pointer-events-none">
                       What's on your mind, {user?.name?.split(" ")[0] || "User"}
