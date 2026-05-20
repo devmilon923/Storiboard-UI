@@ -13,6 +13,7 @@ import {
   X,
   Sparkles,
   BaselineIcon,
+  Heading1,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
