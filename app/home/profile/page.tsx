@@ -1,26 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
-  Settings,
   MessageCircle,
   UserPlus,
   UserCheck,
   Link2,
   Calendar,
   MapPin,
-  CheckCircle,
   ArrowLeft,
   User,
   PenSquare,
   BadgeCheck,
+  Sparkles,
+  Loader2,
+  Image as ImageIcon,
+  Heart,
+  UserMinus,
+  Settings,
+  BookOpen,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthContext";
+import { SocialPostCard, Post } from "@/components/social-post-card";
+import { CommentSidebar } from "@/components/comment-sidebar";
+import { useGetAllPosts } from "@/utils/api/endpoints";
+import BookmarkPost from "@/components/bookmarkPost";
 
 // Mock data - replace with your actual API calls
 const MOCK_USER = {
@@ -35,7 +43,7 @@ const MOCK_USER = {
   isVerified: true,
   followerCount: 12450,
   followingCount: 832,
-  postCount: 347,
+  postCount: 12,
 };
 
 const MOCK_OTHER_USER = {
@@ -50,320 +58,397 @@ const MOCK_OTHER_USER = {
   isVerified: false,
   followerCount: 3420,
   followingCount: 456,
-  postCount: 128,
+  postCount: 4,
 };
 
 export default function ProfilePage() {
   const router = useRouter();
   const { user: currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState("posts");
+  const [activeTab, setActiveTab] = useState("recent");
+  
   // For demo: change this to false to see "other user" view
   // In real app, check if profile userId matches current user id
-  const isOwnProfile = true; // Change to false for other user view
+  const isOwnProfile = true; 
 
-  const profileUser = isOwnProfile ? MOCK_USER : MOCK_OTHER_USER;
+  const profileUser = isOwnProfile
+    ? {
+        ...MOCK_USER,
+        ...currentUser,
+        image: currentUser?.image || MOCK_USER.image,
+        name: currentUser?.name || MOCK_USER.name,
+        id: currentUser?.id ? String(currentUser.id) : MOCK_USER.id,
+      }
+    : MOCK_OTHER_USER;
 
   const [isFollowing, setIsFollowing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Comments Sidebar state
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const handleFollowToggle = () => {
-    if (isFollowing) {
-      setIsFollowing(false);
-    } else {
-      setIsFollowing(true);
-    }
+    setIsFollowing(!isFollowing);
   };
 
   const formatJoinDate = (date: string) => {
     const joinDate = new Date(date);
-    return `Joined ${joinDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`;
+    return `Joined ${joinDate.toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    })}`;
   };
 
+  // Fetch real posts
+  const { data: postsData, isLoading: isPostsLoading } = useGetAllPosts(20);
+  const allPosts: Post[] = postsData?.pages.flatMap((page: any) => page.data) || [];
+
+  // Filter posts by the current profile user
+  const userPosts = allPosts.filter((post) => {
+    if (!post || !post.author) return false;
+    const authorIdStr = String(post.author.id);
+    const profileIdStr = String(profileUser.id);
+    return authorIdStr === profileIdStr || post.author.name === profileUser.name;
+  });
+
+  // Top Trending: sort user posts by likesCount descending
+  const trendingPosts = [...userPosts].sort((a, b) => b.likesCount - a.likesCount);
+
+  const handleOpenComments = (post: Post, commentId?: string | number) => {
+    setSelectedPost(post);
+    setIsSidebarOpen(true);
+  };
+
+  const handleCloseSidebar = () => {
+    setIsSidebarOpen(false);
+    setTimeout(() => {
+      setSelectedPost(null);
+    }, 300);
+  };
+
+  const totalPostCount = userPosts.length > 0 ? userPosts.length : profileUser.postCount;
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border/50">
-        <div className="max-w-2xl w-full mx-auto px-4">
-          <div className="flex items-center gap-4 h-14">
-            <button
-              onClick={() => router.back()}
-              className="p-2 -ml-2 hover:bg-muted rounded-full transition-colors cursor-pointer"
-            >
-              <ArrowLeft className="size-5" />
-            </button>
-            <div>
-              <h1 className="font-semibold">{profileUser.name}</h1>
-              <p className="text-xs text-muted-foreground">
-                {profileUser.postCount} posts
-              </p>
-            </div>
-            {/* {isOwnProfile && (
-              <button 
-                onClick={() => router.push('/settings/profile')}
-                className="ml-auto p-2 hover:bg-muted rounded-full transition-colors cursor-pointer"
+    <div className="flex w-full min-h-screen bg-background relative">
+      {/* Scrollable Main Area */}
+      <div className="flex-1 max-w-2xl w-full mx-auto pb-24 border-x border-border/30 bg-background/50 backdrop-blur-xs min-h-screen">
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border/40">
+          <div className="px-4">
+            <div className="flex items-center gap-4 h-14">
+              <button
+                onClick={() => router.back()}
+                className="p-2 -ml-2 hover:bg-muted rounded-full transition-colors cursor-pointer text-foreground/80 hover:text-foreground"
               >
-                <Settings className="size-5" />
+                <ArrowLeft className="size-5" />
               </button>
-            )} */}
+              <div>
+                <h1 className="font-extrabold tracking-tight text-foreground">{profileUser.name}</h1>
+                <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
+                  {totalPostCount} {totalPostCount === 1 ? "post" : "posts"}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-2xl w-full mx-auto px-4 py-6 ">
-        {/* Profile Info */}
-        <div className="space-y-5">
-          {/* Avatar and Stats Row */}
-          <div className="flex items-start justify-between gap-6">
-            {/* Avatar */}
-            <div
-              className="relative shrink-0 cursor-pointer"
-              onClick={() => router.push(`/profile/${profileUser.id}/photo`)}
-            >
-              <div className="size-20 rounded-full ring-4 ring-background bg-linear-to-br from-primary/20 to-primary/10 overflow-hidden">
-                {profileUser.image ? (
-                  <Image
-                    src={profileUser.image}
-                    alt={profileUser.name}
-                    width={80}
-                    height={80}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <User className="size-9 text-primary/40" />
+        {/* Profile Details Area (No Cover Photo) */}
+        <div className="px-4 sm:px-6 py-6 space-y-6">
+          
+          {/* Asymmetric Profile Metadata & Avatar block */}
+          <div className="flex flex-col md:flex-row items-start justify-between gap-6 pb-6 border-b border-border/30">
+            <div className="flex-1 space-y-4">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="text-3xl font-black tracking-tight text-foreground">{profileUser.name}</h2>
+                  {profileUser.isVerified && (
+                    <BadgeCheck className="size-6 fill-primary text-primary-foreground shrink-0 shadow-xs" />
+                  )}
+                  {isOwnProfile && (
+                    <span className="bg-primary/10 text-primary border border-primary/20 text-[9px] uppercase tracking-widest font-black px-2.5 py-0.5 rounded-full select-none">
+                      Creator
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm font-semibold text-muted-foreground/80">@{profileUser.username || "creator"}</p>
+              </div>
+
+              {profileUser.bio && (
+                <p className="text-foreground/80 text-sm leading-relaxed max-w-xl font-medium">
+                  {profileUser.bio}
+                </p>
+              )}
+
+              {/* Meta tags */}
+              <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground/80 pt-1 font-semibold">
+                {profileUser.location && (
+                  <div className="flex items-center gap-1.5 hover:text-foreground transition-colors">
+                    <MapPin className="size-4 text-rose-500" />
+                    <span>{profileUser.location}</span>
                   </div>
                 )}
+                {profileUser.website && (
+                  <div className="flex items-center gap-1.5">
+                    <Link2 className="size-4 text-primary" />
+                    <a
+                      href={`https://${profileUser.website}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline underline-offset-4 cursor-pointer hover:text-primary/80 transition-colors"
+                    >
+                      {profileUser.website}
+                    </a>
+                  </div>
+                )}
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="size-4 text-emerald-500" />
+                  <span>{formatJoinDate(profileUser.joinDate)}</span>
+                </div>
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="flex-1 flex justify-around">
-              <div className="text-center">
-                <div className="font-bold text-lg">
-                  {profileUser.postCount.toLocaleString()}
+            {/* Avatar */}
+            <div
+              className="relative size-24 sm:size-28 rounded-2xl ring-4 ring-muted bg-linear-to-br from-primary/30 to-primary/10 overflow-hidden shadow-md group cursor-pointer shrink-0"
+              onClick={() => router.push(`/profile/${profileUser.id}/photo`)}
+            >
+              {profileUser.image ? (
+                <img
+                  src={profileUser.image}
+                  alt={profileUser.name}
+                  className="h-full w-full object-cover group-hover:scale-105 transition-all duration-500"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-muted/70 group-hover:scale-105 transition-all duration-500">
+                  <User className="size-12 text-primary/40 animate-pulse" />
                 </div>
-                <div className="text-xs text-muted-foreground">posts</div>
+              )}
+              {isOwnProfile && (
+                <div className="absolute inset-0 bg-black/45 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <PenSquare className="size-5 text-white" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Stats & Actions Row */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
+            {/* Stats Block */}
+            <div className="flex gap-2 bg-muted/30 border border-border/30 rounded-2xl p-2.5 shadow-xs shrink-0 justify-around sm:justify-start">
+              <div className="text-center px-4 min-w-[70px]">
+                <div className="font-black text-base text-foreground">
+                  {totalPostCount.toLocaleString()}
+                </div>
+                <div className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">posts</div>
               </div>
+              <div className="w-px bg-border/40 my-1" />
               <div
-                className="text-center cursor-pointer"
-                onClick={() =>
-                  router.push(`/profile/${profileUser.id}/followers`)
-                }
+                className="text-center px-4 min-w-[70px] cursor-pointer hover:text-primary transition-colors group/stat"
+                onClick={() => router.push(`/profile/${profileUser.id}/followers`)}
               >
-                <div className="font-bold text-lg">
+                <div className="font-black text-base text-foreground group-hover/stat:scale-105 transition-transform">
                   {profileUser.followerCount.toLocaleString()}
                 </div>
-                <div className="text-xs text-muted-foreground">followers</div>
+                <div className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">followers</div>
               </div>
+              <div className="w-px bg-border/40 my-1" />
               <div
-                className="text-center cursor-pointer"
-                onClick={() =>
-                  router.push(`/profile/${profileUser.id}/following`)
-                }
+                className="text-center px-4 min-w-[70px] cursor-pointer hover:text-primary transition-colors group/stat"
+                onClick={() => router.push(`/profile/${profileUser.id}/following`)}
               >
-                <div className="font-bold text-lg">
+                <div className="font-black text-base text-foreground group-hover/stat:scale-105 transition-transform">
                   {profileUser.followingCount.toLocaleString()}
                 </div>
-                <div className="text-xs text-muted-foreground">following</div>
+                <div className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">following</div>
               </div>
             </div>
-          </div>
 
-          {/* Name and Bio */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <h2 className="text-xl font-bold">{profileUser.name}</h2>
-              {profileUser.isVerified && (
-                <BadgeCheck className=" fill-primary text-primary-foreground shrink-0" />
-              )}
-            </div>
-            {/* <p className="text-muted-foreground text-sm">@{profileUser.username}</p> */}
-
-            {profileUser.bio && (
-              <p className="text-foreground/80 text-sm leading-relaxed">
-                {profileUser.bio}
-              </p>
-            )}
-
-            {/* Meta Info */}
-            <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground pt-1">
-              {profileUser.location && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="size-3.5" />
-                  <span>{profileUser.location}</span>
-                </div>
-              )}
-              {profileUser.website && (
-                <div className="flex items-center gap-1">
-                  <Link2 className="size-3.5" />
-                  <a
-                    href={`https://${profileUser.website}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline cursor-pointer"
-                  >
-                    {profileUser.website}
-                  </a>
-                </div>
-              )}
-              <div className="flex items-center gap-1">
-                <Calendar className="size-3.5" />
-                <span>{formatJoinDate(profileUser.joinDate)}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3">
-            {isOwnProfile ? (
-              <Button
-                onClick={() => router.push("/settings/profile")}
-                variant="outline"
-                className="flex-1 gap-2 cursor-pointer"
-              >
-                <PenSquare className="size-4" />
-                Edit Profile
-              </Button>
-            ) : (
-              <>
+            {/* Actions Grid */}
+            <div className="flex gap-2 flex-1 sm:justify-end">
+              {isOwnProfile ? (
                 <Button
-                  onClick={handleFollowToggle}
-                  variant={isFollowing ? "outline" : "default"}
-                  className="flex-1 gap-2 cursor-pointer"
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
+                  onClick={() => router.push("/settings/profile")}
+                  variant="outline"
+                  className="w-full sm:w-auto gap-2 cursor-pointer font-bold rounded-xl border-border/60 hover:bg-muted shadow-xs transition-all hover:scale-[1.01] px-5 h-10"
                 >
-                  {isFollowing ? (
-                    isHovered ? (
-                      <>
-                        <UserMinus className="size-4" />
-                        Unfollow
-                      </>
+                  <PenSquare className="size-4 text-muted-foreground" />
+                  Edit Profile
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    onClick={handleFollowToggle}
+                    variant={isFollowing ? "outline" : "default"}
+                    className={cn(
+                      "flex-1 sm:flex-initial gap-2 cursor-pointer font-bold rounded-xl shadow-xs transition-all hover:scale-[1.01] px-6 h-10",
+                      isFollowing
+                        ? "border-primary/20 hover:bg-primary/5 text-primary"
+                        : "bg-primary text-primary-foreground shadow-md shadow-primary/10 hover:shadow-primary/20"
+                    )}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                  >
+                    {isFollowing ? (
+                      isHovered ? (
+                        <>
+                          <UserMinus className="size-4" />
+                          Unfollow
+                        </>
+                      ) : (
+                        <>
+                          <UserCheck className="size-4 animate-pulse" />
+                          Following
+                        </>
+                      )
                     ) : (
                       <>
-                        <UserCheck className="size-4" />
-                        Following
+                        <UserPlus className="size-4" />
+                        Follow
                       </>
-                    )
+                    )}
+                  </Button>
+                  <Button
+                    onClick={() => router.push(`/messages/${profileUser.id}`)}
+                    variant="outline"
+                    className="gap-2 cursor-pointer font-bold rounded-xl border-border/60 hover:bg-muted shadow-xs transition-all hover:scale-[1.01] px-5 h-10"
+                  >
+                    <MessageCircle className="size-4 text-muted-foreground" />
+                    Message
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Navigation Tabs (Glassmorphic Slider Design) */}
+          <div className="mt-8">
+            <div className="flex p-1 bg-muted/40 backdrop-blur-sm border border-border/30 rounded-2xl relative">
+              {[
+                { id: "recent", label: "Recent Posts" },
+                { id: "trending", label: "Top Trending" },
+                { id: "saved", label: "Saved Posts" },
+              ].map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    className={cn(
+                      "flex-1 py-2.5 text-xs font-black tracking-wider uppercase rounded-xl transition-all duration-300 cursor-pointer relative z-10",
+                      isActive
+                        ? "text-primary-foreground bg-primary shadow-md shadow-primary/20 scale-[1.02]"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                    )}
+                    onClick={() => setActiveTab(tab.id)}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Dynamic Content Panel */}
+            <div className="mt-8">
+              {activeTab === "recent" && (
+                <div className="space-y-6">
+                  {isPostsLoading ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground animate-in fade-in duration-300">
+                      <Loader2 className="size-8 animate-spin text-primary mb-4" />
+                      <p className="text-xs uppercase font-extrabold tracking-widest animate-pulse">
+                        Loading Feed...
+                      </p>
+                    </div>
+                  ) : userPosts.length > 0 ? (
+                    <div className="flex flex-col gap-6 animate-in fade-in duration-500">
+                      {userPosts.map((post) => (
+                        <SocialPostCard
+                          key={post.id}
+                          post={post}
+                          onOpenComments={(commentId) =>
+                            handleOpenComments(post, commentId)
+                          }
+                        />
+                      ))}
+                    </div>
                   ) : (
-                    <>
-                      <UserPlus className="size-4" />
-                      Follow
-                    </>
+                    <div className="text-center py-20 bg-muted/15 border border-dashed border-border/50 rounded-3xl p-8 relative overflow-hidden group animate-in fade-in duration-500">
+                      <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="size-16 rounded-2xl bg-primary/5 flex items-center justify-center mx-auto mb-4 border border-primary/10 shadow-inner group-hover:scale-110 transition-all duration-500">
+                        <Sparkles className="size-8 text-primary" />
+                      </div>
+                      <h3 className="font-extrabold text-foreground mb-1.5">No stories shared yet</h3>
+                      <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-6 leading-relaxed">
+                        {isOwnProfile
+                          ? "You haven't written any stories yet. Share your thoughts, designs, or ideas with the world!"
+                          : `${profileUser.name} hasn't posted anything yet.`}
+                      </p>
+                      {isOwnProfile && (
+                        <Button
+                          onClick={() => router.push("/home")}
+                          className="gap-2 cursor-pointer font-bold rounded-xl shadow-md shadow-primary/15 hover:shadow-primary/25 transition-all"
+                        >
+                          <PenSquare className="size-4" />
+                          Create Story
+                        </Button>
+                      )}
+                    </div>
                   )}
-                </Button>
-                <Button
-                  onClick={() => router.push(`/messages/${profileUser.id}`)}
-                  variant="outline"
-                  className="gap-2 cursor-pointer"
-                >
-                  <MessageCircle className="size-4" />
-                  Message
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
+                </div>
+              )}
 
-        {/* Simple Tabs (no shadcn Tabs, using custom for compactness) */}
-        <div className="mt-8">
-          <div className="flex border-b border-border">
-            {["Posts", "Replies", "Media", "Likes"].map((tab) => (
-              <button
-                key={tab}
-                className="flex-1 pb-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer data-[active=true]:text-primary data-[active=true]:border-b-2 data-[active=true]:border-primary"
-                data-active={activeTab === tab.toLowerCase()}
-                onClick={() => setActiveTab(tab.toLowerCase())}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
+              {activeTab === "trending" && (
+                <div className="space-y-6">
+                  {isPostsLoading ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground animate-in fade-in duration-300">
+                      <Loader2 className="size-8 animate-spin text-primary mb-4" />
+                      <p className="text-xs uppercase font-extrabold tracking-widest animate-pulse">
+                        Loading Trending...
+                      </p>
+                    </div>
+                  ) : trendingPosts.length > 0 ? (
+                    <div className="flex flex-col gap-6 animate-in fade-in duration-500">
+                      {trendingPosts.map((post) => (
+                        <SocialPostCard
+                          key={post.id}
+                          post={post}
+                          onOpenComments={(commentId) =>
+                            handleOpenComments(post, commentId)
+                          }
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-20 bg-muted/15 border border-dashed border-border/50 rounded-3xl p-8 relative overflow-hidden group animate-in fade-in duration-500">
+                      <div className="size-16 rounded-2xl bg-primary/5 flex items-center justify-center mx-auto mb-4 border border-primary/10 shadow-inner group-hover:scale-110 transition-all duration-500">
+                        <Sparkles className="size-8 text-primary animate-pulse" />
+                      </div>
+                      <h3 className="font-extrabold text-foreground mb-1.5">No trending stories</h3>
+                      <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-6 leading-relaxed">
+                        Top posts with the highest popularity rating will appear here once created and liked.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
 
-          <div className="mt-6">
-            {activeTab === "posts" && (
-              <div className="text-center py-12 text-muted-foreground">
-                <User className="size-12 mx-auto mb-3 opacity-50" />
-                <p className="text-sm">No posts yet</p>
-              </div>
-            )}
-            {activeTab === "replies" && (
-              <div className="text-center py-12 text-muted-foreground">
-                <MessageCircle className="size-12 mx-auto mb-3 opacity-50" />
-                <p className="text-sm">No replies yet</p>
-              </div>
-            )}
-            {activeTab === "media" && (
-              <div className="text-center py-12 text-muted-foreground">
-                <ImageIcon className="size-12 mx-auto mb-3 opacity-50" />
-                <p className="text-sm">No media yet</p>
-              </div>
-            )}
-            {activeTab === "likes" && (
-              <div className="text-center py-12 text-muted-foreground">
-                <Heart className="size-12 mx-auto mb-3 opacity-50" />
-                <p className="text-sm">No liked posts yet</p>
-              </div>
-            )}
+              {activeTab === "saved" && (
+                <div className="animate-in fade-in duration-500">
+                  <BookmarkPost
+                    isActive={activeTab === "saved"}
+                    onOpenComments={handleOpenComments}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Floating Comment Discussions Sidebar */}
+      <CommentSidebar
+        post={selectedPost}
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+      />
     </div>
   );
 }
-
-// Helper icons
-const UserMinus = (props: any) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" />
-    <line x1="22" x2="16" y1="11" y2="11" />
-  </svg>
-);
-
-const Heart = (props: any) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-  </svg>
-);
-
-const ImageIcon = (props: any) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="2" y="2" width="20" height="20" rx="2" ry="2" />
-    <circle cx="8.5" cy="8.5" r="2.5" />
-    <polyline points="21 15 16 10 5 21" />
-  </svg>
-);

@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Briefcase,
   UserCheck,
+  Loader2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -312,7 +313,19 @@ function FollowersPage() {
               </Button>
             </Card>
           )}
-          <div ref={ref}>Load more....</div>
+          <div ref={ref} className="py-4 flex justify-center">
+            {isFetchingNextPage ? (
+              <Loader2 className="size-5 animate-spin text-primary" />
+            ) : hasNextPage ? (
+              <span className="text-xs text-muted-foreground animate-pulse">
+                Loading more followers...
+              </span>
+            ) : finalData.length > 0 ? (
+              <span className="text-xs text-muted-foreground/50 italic">
+                You've reached the end of the list
+              </span>
+            ) : null}
+          </div>
           {/* Footer */}
           <div className="pt-4 flex items-center justify-between text-[10px] sm:text-xs text-muted-foreground/60 border-t border-border/30">
             <span>List updated real-time</span>
