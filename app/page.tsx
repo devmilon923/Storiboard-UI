@@ -59,8 +59,6 @@ export default function Page() {
     setMounted(true);
   }, []);
 
-
-
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-background">
       {/* ─── Ambient Background ─── */}
@@ -68,8 +66,8 @@ export default function Page() {
         className="pointer-events-none absolute inset-0 -z-10"
         aria-hidden="true"
       >
-        <div className="absolute -top-[25%] left-1/3 h-[700px] w-[700px] rounded-full bg-primary/3 blur-[140px]" />
-        <div className="absolute -bottom-[10%] right-1/4 h-[500px] w-[500px] rounded-full bg-primary/2 blur-[120px]" />
+        <div className="absolute -top-[25%] left-1/3 h-175 w-175 rounded-full bg-primary/3 blur-[140px]" />
+        <div className="absolute -bottom-[10%] right-1/4 h-125 w-125 rounded-full bg-primary/2 blur-[120px]" />
       </div>
 
       {/* ─── Navbar ─── */}
@@ -82,7 +80,10 @@ export default function Page() {
             id="nav-brand"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-sm group-hover:shadow-primary/20">
-              <Feather size={16} className="text-primary group-hover:text-primary-foreground transition-colors" />
+              <Feather
+                size={16}
+                className="text-primary group-hover:text-primary-foreground transition-colors"
+              />
             </div>
             <span className="text-[17px] font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors">
               Storiboard
@@ -137,9 +138,7 @@ export default function Page() {
                 <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-[3.25rem] lg:leading-[1.15]">
                   Your stories
                   <br />
-                  <span className="text-muted-foreground/70">
-                    are waiting.
-                  </span>
+                  <span className="text-muted-foreground/70">are waiting.</span>
                 </h1>
 
                 <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
@@ -168,9 +167,14 @@ export default function Page() {
                       className="flex items-center gap-3 text-sm text-muted-foreground group/item"
                     >
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 group-hover/item:bg-primary/20 transition-colors">
-                        <Icon size={15} className="text-primary transition-transform group-hover/item:scale-110" />
+                        <Icon
+                          size={15}
+                          className="text-primary transition-transform group-hover/item:scale-110"
+                        />
                       </div>
-                      <span className="group-hover/item:text-foreground transition-colors">{text}</span>
+                      <span className="group-hover/item:text-foreground transition-colors">
+                        {text}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -183,17 +187,17 @@ export default function Page() {
               >
                 <div className="rounded-2xl border border-border/50 bg-card/80 p-6 shadow-sm backdrop-blur-sm sm:p-8">
                   <div className="mb-5 flex items-center gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-foreground text-xl font-bold uppercase text-primary shadow-inner border border-primary/20 overflow-hidden">
-                    {user.image ? (
-                      <img
-                        src={user.image}
-                        alt={user.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      user.name?.charAt(0) || "U"
-                    )}
-                  </div>
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-foreground text-xl font-bold uppercase text-primary shadow-inner border border-primary/20 overflow-hidden">
+                      {user.image ? (
+                        <img
+                          src={user.image}
+                          alt={user.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        user.name?.charAt(0) || "U"
+                      )}
+                    </div>
                     <div className="min-w-0">
                       <h2 className="text-lg font-semibold text-foreground truncate">
                         {user.name}
@@ -205,11 +209,7 @@ export default function Page() {
                   </div>
 
                   <div className="space-y-2.5">
-                    <Button
-                      asChild
-                      variant="premium"
-                      className="h-11 w-full"
-                    >
+                    <Button asChild variant="premium" className="h-11 w-full">
                       <Link href="/home" id="hero-go-to-feed">
                         Go to Feed
                         <ArrowRight size={15} className="ml-1.5" />
@@ -254,9 +254,7 @@ export default function Page() {
                Left  = Headline + features
                Right = Login card with register link
             ════════════════════════════════════════ */
-            <div
-              className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20"
-            >
+            <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
               {/* Left Column — Headline & Value Props */}
               <div
                 className={`${
@@ -304,9 +302,15 @@ export default function Page() {
                       desc: "Your story could spark a film, a book, or someone's dream.",
                     },
                   ].map(({ icon: Icon, title, desc }) => (
-                    <div key={title} className="flex items-start gap-3 group/item">
+                    <div
+                      key={title}
+                      className="flex items-start gap-3 group/item"
+                    >
                       <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 group-hover/item:bg-primary/20 transition-all duration-300">
-                        <Icon size={16} className="text-primary group-hover/item:scale-110 transition-transform" />
+                        <Icon
+                          size={16}
+                          className="text-primary group-hover/item:scale-110 transition-transform"
+                        />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-foreground group-hover/item:text-primary transition-colors">
@@ -458,7 +462,10 @@ export default function Page() {
                   >
                     <Link href="/auth/register" id="hero-register-btn">
                       Create an Account
-                      <ArrowRight size={15} className="ml-1.5 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight
+                        size={15}
+                        className="ml-1.5 group-hover:translate-x-1 transition-transform"
+                      />
                     </Link>
                   </Button>
 
