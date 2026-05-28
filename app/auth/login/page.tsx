@@ -11,7 +11,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import z from "zod";
 import { useAuth } from "@/providers/AuthContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 const passwordSchema = z
   .string()
@@ -27,6 +28,7 @@ const formSchema = z.object({
 export default function LoginPage() {
   const { setUser } = useAuth();
   const login = useLoginUser();
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -117,16 +119,26 @@ export default function LoginPage() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <div className="space-y-1">
-                  <Input
-                    {...field}
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
-                    required
-                    className="h-11 rounded-2xl border-border/60 bg-background/60 px-4 transition-all focus:ring-2 focus:ring-primary/20"
-                    aria-invalid={fieldState.invalid}
-                  />
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      autoComplete="current-password"
+                      required
+                      className="h-11 rounded-2xl border-border/60 bg-background/60 px-4 pr-10 transition-all focus:ring-2 focus:ring-primary/20"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground/60 transition-colors hover:text-foreground"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                   {fieldState.error && (
                     <p className="text-[10px] text-destructive font-medium ml-2">
                       {fieldState.error.message}

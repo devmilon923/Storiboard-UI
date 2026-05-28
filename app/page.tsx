@@ -343,6 +343,7 @@ export default function Page() {
                   <form
                     className="space-y-3.5"
                     onSubmit={form.handleSubmit(onSubmit)}
+                    suppressHydrationWarning
                   >
                     <div className="space-y-1.5">
                       <Label

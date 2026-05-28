@@ -65,10 +65,10 @@ export default function ProfilePage() {
   const router = useRouter();
   const { user: currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState("recent");
-  
+
   // For demo: change this to false to see "other user" view
   // In real app, check if profile userId matches current user id
-  const isOwnProfile = true; 
+  const isOwnProfile = true;
 
   const profileUser = isOwnProfile
     ? {
@@ -101,18 +101,23 @@ export default function ProfilePage() {
 
   // Fetch real posts
   const { data: postsData, isLoading: isPostsLoading } = useGetAllPosts(20);
-  const allPosts: Post[] = postsData?.pages.flatMap((page: any) => page.data) || [];
+  const allPosts: Post[] =
+    postsData?.pages.flatMap((page: any) => page.data) || [];
 
   // Filter posts by the current profile user
   const userPosts = allPosts.filter((post) => {
     if (!post || !post.author) return false;
     const authorIdStr = String(post.author.id);
     const profileIdStr = String(profileUser.id);
-    return authorIdStr === profileIdStr || post.author.name === profileUser.name;
+    return (
+      authorIdStr === profileIdStr || post.author.name === profileUser.name
+    );
   });
 
   // Top Trending: sort user posts by likesCount descending
-  const trendingPosts = [...userPosts].sort((a, b) => b.likesCount - a.likesCount);
+  const trendingPosts = [...userPosts].sort(
+    (a, b) => b.likesCount - a.likesCount,
+  );
 
   const handleOpenComments = (post: Post, commentId?: string | number) => {
     setSelectedPost(post);
@@ -126,12 +131,13 @@ export default function ProfilePage() {
     }, 300);
   };
 
-  const totalPostCount = userPosts.length > 0 ? userPosts.length : profileUser.postCount;
+  const totalPostCount =
+    userPosts.length > 0 ? userPosts.length : profileUser.postCount;
 
   return (
     <div className="flex w-full min-h-screen bg-background relative">
       {/* Scrollable Main Area */}
-      <div className="flex-1 max-w-2xl w-full mx-auto pb-24 border-x border-border/30 bg-background/50 backdrop-blur-xs min-h-screen">
+      <div className="flex-1 max-w-2xl w-full mx-auto pb-24  bg-background/50 backdrop-blur-xs min-h-screen">
         {/* Sticky Header */}
         <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border/40">
           <div className="px-4">
@@ -143,7 +149,9 @@ export default function ProfilePage() {
                 <ArrowLeft className="size-5" />
               </button>
               <div>
-                <h1 className="font-extrabold tracking-tight text-foreground">{profileUser.name}</h1>
+                <h1 className="font-extrabold tracking-tight text-foreground">
+                  {profileUser.name}
+                </h1>
                 <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
                   {totalPostCount} {totalPostCount === 1 ? "post" : "posts"}
                 </p>
@@ -153,14 +161,15 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile Details Area (No Cover Photo) */}
-        <div className="px-4 sm:px-6 py-6 space-y-6">
-          
+        <div className="px-4 sm:px-6 py-6 space-y-6 mt-2">
           {/* Asymmetric Profile Metadata & Avatar block */}
-          <div className="flex flex-col md:flex-row items-start justify-between gap-6 pb-6 border-b border-border/30">
+          <div className="flex flex-col md:flex-row items-start justify-between gap-6 pb-6 ">
             <div className="flex-1 space-y-4">
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="text-3xl font-black tracking-tight text-foreground">{profileUser.name}</h2>
+                  <h2 className="text-3xl font-black tracking-tight text-foreground">
+                    {profileUser.name}
+                  </h2>
                   {profileUser.isVerified && (
                     <BadgeCheck className="size-6 fill-primary text-primary-foreground shrink-0 shadow-xs" />
                   )}
@@ -170,7 +179,9 @@ export default function ProfilePage() {
                     </span>
                   )}
                 </div>
-                <p className="text-sm font-semibold text-muted-foreground/80">@{profileUser.username || "creator"}</p>
+                <p className="text-sm font-semibold text-muted-foreground/80">
+                  @{profileUser.username || "creator"}
+                </p>
               </div>
 
               {profileUser.bio && (
@@ -239,27 +250,37 @@ export default function ProfilePage() {
                 <div className="font-black text-base text-foreground">
                   {totalPostCount.toLocaleString()}
                 </div>
-                <div className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">posts</div>
+                <div className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">
+                  posts
+                </div>
               </div>
               <div className="w-px bg-border/40 my-1" />
               <div
                 className="text-center px-4 min-w-[70px] cursor-pointer hover:text-primary transition-colors group/stat"
-                onClick={() => router.push(`/profile/${profileUser.id}/followers`)}
+                onClick={() =>
+                  router.push(`/profile/${profileUser.id}/followers`)
+                }
               >
                 <div className="font-black text-base text-foreground group-hover/stat:scale-105 transition-transform">
                   {profileUser.followerCount.toLocaleString()}
                 </div>
-                <div className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">followers</div>
+                <div className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">
+                  followers
+                </div>
               </div>
               <div className="w-px bg-border/40 my-1" />
               <div
                 className="text-center px-4 min-w-[70px] cursor-pointer hover:text-primary transition-colors group/stat"
-                onClick={() => router.push(`/profile/${profileUser.id}/following`)}
+                onClick={() =>
+                  router.push(`/profile/${profileUser.id}/following`)
+                }
               >
                 <div className="font-black text-base text-foreground group-hover/stat:scale-105 transition-transform">
                   {profileUser.followingCount.toLocaleString()}
                 </div>
-                <div className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">following</div>
+                <div className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">
+                  following
+                </div>
               </div>
             </div>
 
@@ -283,7 +304,7 @@ export default function ProfilePage() {
                       "flex-1 sm:flex-initial gap-2 cursor-pointer font-bold rounded-xl shadow-xs transition-all hover:scale-[1.01] px-6 h-10",
                       isFollowing
                         ? "border-primary/20 hover:bg-primary/5 text-primary"
-                        : "bg-primary text-primary-foreground shadow-md shadow-primary/10 hover:shadow-primary/20"
+                        : "bg-primary text-primary-foreground shadow-md shadow-primary/10 hover:shadow-primary/20",
                     )}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
@@ -336,7 +357,7 @@ export default function ProfilePage() {
                       "flex-1 py-2.5 text-xs font-black tracking-wider uppercase rounded-xl transition-all duration-300 cursor-pointer relative z-10",
                       isActive
                         ? "text-primary-foreground bg-primary shadow-md shadow-primary/20 scale-[1.02]"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/30",
                     )}
                     onClick={() => setActiveTab(tab.id)}
                   >
@@ -375,7 +396,9 @@ export default function ProfilePage() {
                       <div className="size-16 rounded-2xl bg-primary/5 flex items-center justify-center mx-auto mb-4 border border-primary/10 shadow-inner group-hover:scale-110 transition-all duration-500">
                         <Sparkles className="size-8 text-primary" />
                       </div>
-                      <h3 className="font-extrabold text-foreground mb-1.5">No stories shared yet</h3>
+                      <h3 className="font-extrabold text-foreground mb-1.5">
+                        No stories shared yet
+                      </h3>
                       <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-6 leading-relaxed">
                         {isOwnProfile
                           ? "You haven't written any stories yet. Share your thoughts, designs, or ideas with the world!"
@@ -421,9 +444,12 @@ export default function ProfilePage() {
                       <div className="size-16 rounded-2xl bg-primary/5 flex items-center justify-center mx-auto mb-4 border border-primary/10 shadow-inner group-hover:scale-110 transition-all duration-500">
                         <Sparkles className="size-8 text-primary animate-pulse" />
                       </div>
-                      <h3 className="font-extrabold text-foreground mb-1.5">No trending stories</h3>
+                      <h3 className="font-extrabold text-foreground mb-1.5">
+                        No trending stories
+                      </h3>
                       <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-6 leading-relaxed">
-                        Top posts with the highest popularity rating will appear here once created and liked.
+                        Top posts with the highest popularity rating will appear
+                        here once created and liked.
                       </p>
                     </div>
                   )}
