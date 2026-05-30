@@ -124,7 +124,9 @@ function RegisterPage() {
         setStep(7);
         console.log("Account verified successfully");
       } catch (error: any) {
-        form.setError("otp", { message: "Somthing is missing" });
+        form.setError("otp", {
+          message: error?.response?.data?.message || "Unknown error",
+        });
         console.log(error?.message);
       }
     }

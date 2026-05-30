@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -9,10 +9,13 @@ export default function ProtectGestRoute({
   children: ReactNode;
 }) {
   const { user, isLoading } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
-
   useEffect(() => {
-    if (!isLoading && user) {
+    setIsMounted(true);
+  }, []);
+  useEffect(() => {
+    if (!isLoading && user && isMounted) {
       if (user.role === "admin") {
         router.push("/dashboard");
       } else {
