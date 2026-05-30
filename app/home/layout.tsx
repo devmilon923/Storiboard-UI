@@ -16,7 +16,7 @@ export default function UserLayout({
     <ProtectUserRoute>
       <div className="flex flex-col min-h-screen">
         <HomeNavbar />
-        <main className="flex-1 w-full overflow-y-scroll">{children}</main>
+        <main className="flex-1 w-full ">{children}</main>
       </div>
     </ProtectUserRoute>
   );
