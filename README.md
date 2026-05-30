@@ -15,36 +15,121 @@ Whether you're looking to publish rich stories, connect with an audience through
 ## 📁 Directory Structure
 
 ```text
-youtube/
-├── app/                  # Next.js App Router root
-│   ├── admin/            # Administrative dashboards
-│   ├── auth/             # Login, Register, and recovery pages
-│   │   ├── login/
-│   │   └── register/
-│   ├── home/             # Core application layout and feed views
-│   │   ├── advanced-editor/ # Story publisher dashboard
-│   │   ├── followers/       # Followers dashboard
-│   │   ├── messages/        # Messaging inbox
-│   │   ├── notifications/   # Real-time event log
-│   │   ├── save-post/       # Bookmarked/saved stories
-│   │   └── page.tsx         # Trending and saved feed page
-│   ├── hooks/            # Directory-wide react hooks
-│   ├── layout.tsx        # Base HTML layout and provider entrypoint
-│   └── page.tsx          # Premium landing page / guest entry
-├── components/           # Reusable UI React components
-│   ├── ui/               # Lower-level components (Buttons, Inputs, etc.)
-│   ├── bookmarkPost.tsx  # Bookmark state component
-│   ├── comment-sidebar.tsx # Threaded side panel comments
-│   ├── create-post.tsx   # Fast-composer feed utility
-│   ├── home-navbar.tsx   # Authenticated persistent navigation bar
-│   └── social-post-card.tsx # Premium post component with rich actions
-├── providers/            # Shared React Contexts (AuthContext, ThemeProvider)
-├── utils/                # API Client wrappers and custom helper utilities
-│   ├── api/
-│   │   ├── endpoints.ts  # TanStack query and Axios mutations / queries
-│   │   └── validations.ts # Frontend schema validation logic
-│   └── helpers.ts        # Helper constants and formatters
-└── public/               # Static assets, fonts, and icons
+storeboard/
+├── 📄 Configuration Files
+│   ├── components.json           # shadcn/ui components configuration
+│   ├── eslint.config.mjs         # ESLint rules and configurations
+│   ├── next.config.ts            # Next.js configuration
+│   ├── tsconfig.json             # TypeScript configuration
+│   ├── postcss.config.mjs         # PostCSS plugins (Tailwind)
+│   └── package.json              # Dependencies and scripts
+│
+├── 📁 app/                       # Next.js App Router (File-based routing)
+│   ├── globals.css               # Global styles and Tailwind directives
+│   ├── layout.tsx                # Root HTML layout and provider entrypoint
+│   ├── page.tsx                  # Premium landing page / guest entry
+│   │
+│   ├── 📁 admin/
+│   │   ├── layout.tsx            # Admin section layout
+│   │   └── page.tsx              # Administrative dashboards
+│   │
+│   ├── 📁 auth/                  # Authentication pages
+│   │   ├── 📁 login/
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx          # User login interface
+│   │   └── 📁 register/
+│   │       ├── layout.tsx
+│   │       └── page.tsx          # User registration with OTP verification
+│   │
+│   ├── 📁 home/                  # Core application - Authenticated user area
+│   │   ├── layout.tsx
+│   │   ├── page.tsx              # Main trending and saved feed
+│   │   │
+│   │   ├── 📁 advanced-editor/   # Rich story publishing dashboard
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   │
+│   │   ├── 📁 followers/         # Followers discovery and management
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   │
+│   │   ├── 📁 messages/          # User messaging inbox
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   │
+│   │   ├── 📁 notifications/     # Real-time event log and alerts
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   │
+│   │   ├── 📁 profile/           # User profile management
+│   │   │   ├── page.tsx          # View profile
+│   │   │   └── 📁 edit/
+│   │   │       ├── page.tsx      # Edit profile form
+│   │   │       └── validation.ts # Zod validation schema for profile
+│   │   │
+│   │   └── 📁 save-post/         # Bookmarked and saved stories
+│   │       ├── layout.tsx
+│   │       └── page.tsx
+│   │
+│   ├── 📁 project/               # Project showcase page
+│   │   └── page.tsx
+│   │
+│   └── 📁 hooks/                 # App-wide React hooks
+│       └── debounce.ts           # Debounce hook for search & input
+│
+├── 📁 components/                # Reusable React UI components
+│   ├── bookmarkPost.tsx          # Post bookmark state management
+│   ├── comment-sidebar.tsx       # Threaded comment panel with infinite pagination
+│   ├── create-post.tsx           # Fast-composer for new posts
+│   ├── home-navbar.tsx           # Authenticated persistent navigation bar
+│   ├── social-post-card.tsx      # Premium post card with likes, comments, shares
+│   │
+│   └── 📁 ui/                    # shadcn/ui primitive components
+│       ├── avatar.tsx            # User avatar component
+│       ├── badge.tsx             # Badge labels
+│       ├── button.tsx            # Reusable button component
+│       ├── card.tsx              # Card container
+│       ├── checkbox.tsx          # Checkbox input
+│       ├── dialog.tsx            # Modal dialog
+│       ├── field.tsx             # Form field wrapper
+│       ├── input-group.tsx       # Grouped input controls
+│       ├── input-otp.tsx         # OTP input field
+│       ├── input.tsx             # Standard input field
+│       ├── label.tsx             # Form label
+│       ├── navbar.tsx            # Navigation bar
+│       ├── scroll-area.tsx       # Scrollable area
+│       ├── select.tsx            # Dropdown select
+│       ├── separator.tsx         # Visual divider
+│       ├── tabs.tsx              # Tabbed interface
+│       └── textarea.tsx          # Multiline text area
+│
+├── 📁 providers/                 # React Context & Providers
+│   ├── AuthContext.tsx           # User authentication state & profile
+│   ├── ProtectAdmin.tsx          # Admin-only route protection
+│   ├── ProtectGest.tsx           # Guest-only route protection (non-auth)
+│   ├── ProtectUser.tsx           # Authenticated user route protection
+│   ├── QueryClient.tsx           # TanStack Query client provider
+│   └── RouteValidation.tsx       # Route validation and permission checks
+│
+├── 📁 lib/
+│   └── utils.ts                  # Utility functions (cn for Tailwind merging)
+│
+├── 📁 utils/                     # API & helper utilities
+│   ├── helpers.ts                # Helper constants, formatters, and utilities
+│   │
+│   └── 📁 api/
+│       ├── endpoints.ts          # TanStack Query hooks and Axios API calls
+│       │                         # Includes mutations for posts, comments, likes
+│       │                         # Includes queries for feed, followers, notifications
+│       └── validations.ts        # Zod schemas for frontend form validation
+│
+├── 📁 public/                    # Static assets
+│   ├── images/                   # Optimized images and illustrations
+│   ├── icons/                    # SVG icons and icon sets
+│   └── fonts/                    # Custom web fonts
+│
+└── 📄 Documentation
+    └── README.md                 # Project documentation
 ```
 
 ---
