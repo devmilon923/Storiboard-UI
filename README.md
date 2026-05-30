@@ -94,6 +94,86 @@ Make sure you have [Node.js](https://nodejs.org/) (v18.x or higher) and [npm](ht
 
 ---
 
+## ✨ Key Features & Highlights
+
+### 🔐 Advanced Authentication with OTP Hashing
+
+- **Secure OTP Verification**: Implements 5-digit OTP validation during user registration for enhanced security
+- **Backend OTP Hashing**: OTPs are cryptographically hashed using industry-standard algorithms (likely bcrypt or similar) before storage
+- **Token-Based Session Management**: Uses JWT tokens with automatic refresh mechanisms via `renewToken` endpoints
+- **Multi-Layer Security**: Integrates role-based access control (Admin, User, Moderator) with protected routes
+
+### 📊 Intelligent Feed Algorithm
+
+- **Cursor-Based Pagination**: Implements efficient cursor pagination for infinite scrolling with `limit` and `pc` (page cursor) parameters
+- **Trending Feed System**: Curated "Trending" tab that surfaces popular posts based on engagement metrics (likes, comments, shares)
+- **Saved Posts Management**: Dedicated "Save Post" tab for bookmarked content with separate API endpoints (`/post/bookmarks/`)
+- **Read Time Estimation**: Automatically calculates and displays estimated reading time for each post (default 200 words/minute)
+- **Real-time Feed Updates**: TanStack Query manages cache invalidation for instant post creation and bookmark updates
+
+### 💬 Post with Nested Threaded Comments
+
+- **Multi-Level Comment System**: Full support for main comments and nested replies (up to N-levels)
+- **Threaded Reply Architecture**: Replies are linked to parent comments via `sourceId` and `commentType` ("post" | "replie")
+- **Infinite Comment Pagination**: Each comment thread supports infinite pagination through `useGetAllComments` and `useGetAllReplie` hooks
+- **Interactive Comment Sidebar**: Dedicated comment panel displaying entire conversation thread with real-time updates
+- **Comment Actions**: Like, reply, and delete functionality on each comment with optimistic UI updates
+
+### 🗄️ Prisma with PostgreSQL
+
+- **Type-Safe Database ORM**: Prisma ORM for fully type-safe database operations and migrations
+- **PostgreSQL Integration**: Production-grade relational database with ACID compliance
+- **Auto-Generated Migrations**: Schema versioning through Prisma Migrate for collaborative development
+- **Optimized Queries**: Efficient data fetching with relation loading and selective field queries
+- **Scalable Architecture**: Ready for deployment on cloud platforms like Vercel, Railway, or AWS
+
+### 🎨 Clean & Premium UI System
+
+#### **Glassmorphism Design**
+
+- Backdrop blur utility combined with border-opacity overlays (`backdrop-blur-sm bg-card/80 border-border/50`) for floating UI panels
+- Semi-transparent components with visual depth and modern aesthetic
+
+#### **Color & Typography**
+
+- **Premium Dark Mode**: High-contrast, deep-slate backgrounds with subtle pastel accents that reduce eye strain while retaining visual vibrance
+- **Consistent Design System**: Tailwind CSS v4 with custom color tokens for cohesive branding
+- **Readable Typography**: Optimized font sizes and line-height ratios for comfortable reading
+
+#### **Micro-Interactions**
+
+- Smooth hover animations on actionable items (`group-hover:scale-110 group-hover:rotate-3`)
+- Sleek transitions and fade-in animations (`animate-in fade-in slide-in-from-bottom-4`)
+- Loading states with spinning loaders for async operations
+
+#### **Responsive Layout**
+
+- Flexible grids and flexbox layouts that adapt to desktop, tablet, and mobile
+- Native-like experience with proper spacing and touch-friendly buttons
+- Persistent navigation bar with contextual menu items
+
+### 🚀 Advanced Frontend Stack
+
+- **React 19**: Latest React features with server and client components
+- **Next.js 16**: App Router for modern file-based routing and API routes
+- **TanStack Query**: Powerful data fetching, caching, and synchronization
+- **Tailwind CSS v4**: Utility-first CSS with advanced features and plugins
+- **React Hook Form**: Performant form handling with validation
+- **Zod**: Type-safe schema validation for both frontend and backend
+- **Lucide React**: Consistent icon library throughout the application
+- **Sonner**: Beautiful toast notifications for user feedback
+- **Tiptap Editor**: Rich text editor for composing stories with markdown support
+
+### 👥 Social Features
+
+- **Follow System**: Track and manage followers with dedicated followers dashboard
+- **Like & Bookmark**: Interactive post engagement with persistent bookmarks
+- **Real-time Notifications**: Event log system for user interactions and updates
+- **User Profiles**: Comprehensive profiles with bio, website, address, and profession
+- **Advanced Search & Filtering**: Search by profession, with infinite pagination
+
+---
+
 ## 🎨 Design & Aesthetic System
 
 Storiboard utilizes a carefully curated color system and modern styling guidelines to offer a premium UI:
