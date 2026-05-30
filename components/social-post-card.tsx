@@ -220,7 +220,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
 
           {/* Bottom Row: Metadata */}
           <div className="flex items-center gap-y-1 gap-x-2 text-[11px] font-medium text-muted-foreground/60 flex-wrap">
-            <span className="text-primary/60 truncate max-w-[120px]">
+            <span className="text-primary/60 truncate max-w-30">
               {post.author.profession}
             </span>
 
