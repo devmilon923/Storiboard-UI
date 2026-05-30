@@ -286,54 +286,9 @@ export default function EditProfile() {
         </div>
       </div>
 
-      {/* ── Content ── */}
+   
       <div className="mx-auto max-w-2xl px-4 pb-32 pt-8">
-        {/* ── Account Stats ── */}
-        {user && (
-          <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {/* Followers */}
-            <div className="rounded-2xl border border-border/40 bg-muted/30 p-4 text-center">
-              <p className="text-2xl font-black text-foreground">
-                {user._count?.followers ?? 0}
-              </p>
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                Followers
-              </p>
-            </div>
 
-            {/* Following */}
-            <div className="rounded-2xl border border-border/40 bg-muted/30 p-4 text-center">
-              <p className="text-2xl font-black text-foreground">
-                {user._count?.following ?? 0}
-              </p>
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                Following
-              </p>
-            </div>
-
-            {/* Posts */}
-            <div className="rounded-2xl border border-border/40 bg-muted/30 p-4 text-center">
-              <p className="text-2xl font-black text-foreground">
-                {user._count?.posts ?? 0}
-              </p>
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                Posts
-              </p>
-            </div>
-
-            {/* Verification Status */}
-            <div className="rounded-2xl border border-border/40 bg-muted/30 p-4 text-center">
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="text-xl font-black text-foreground">
-                  {user.isVerifyed ? "✓" : "-"}
-                </span>
-              </div>
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                Verified
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* ── Account Info ── */}
         {user && (

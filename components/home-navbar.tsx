@@ -66,7 +66,7 @@ export const HomeNavbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-40 w-full border-b border-border/50 py-1 bg-background/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-50 w-full border-b border-border/50 py-1 bg-background/80 backdrop-blur-md">
       <div className="mx-auto max-w-2xl px-4">
         <div className="flex h-12 items-center justify-between gap-1">
           {NAV_ITEMS.map((item, index) => {
@@ -127,7 +127,7 @@ export const HomeNavbar = () => {
 
                   {/* Dropdown Menu */}
                   {isMenuOpen && (
-                    <div className="absolute top-full mt-2 right-0 min-w-[220px] overflow-hidden rounded-2xl border border-border bg-background/95 p-1.5 shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-200 ease-out z-50">
+                    <div className="absolute top-full mt-2 right-0 min-w-55 overflow-hidden rounded-2xl border border-border bg-background/95 p-1.5 shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-200 ease-out z-50">
                       <div className="px-3 py-3 mb-1 border-b border-border/50">
                         <div className="flex items-center gap-3">
                           <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase overflow-hidden border border-border/50">
