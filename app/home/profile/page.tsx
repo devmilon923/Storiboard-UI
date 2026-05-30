@@ -123,9 +123,9 @@ export default function ProfilePage() {
                     <BadgeCheck className="size-6 fill-primary text-primary-foreground shrink-0 shadow-xs" />
                   )}
 
-                  {profileUser?.role && (
+                  {profileUser?.profession && (
                     <span className="bg-primary/10 text-primary border border-primary/20 text-[9px] tracking-widest font-black px-2.5 py-0.5 rounded-full select-none capitalize">
-                      {profileUser.role}
+                      {profileUser.profession}
                     </span>
                   )}
                 </div>
