@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { useLoginUser } from "@/utils/api/endpoints";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import z from "zod";
 import { useAuth } from "@/providers/AuthContext";
@@ -47,6 +46,8 @@ export default function LoginPage() {
       });
       setUser(result.data);
     } catch (error: any) {
+      form.setError("email", { message: "Invalid email address" });
+      form.setError("password", { message: "Invalid password" });
       console.log("Login failed", error.response.data.message);
     }
   }

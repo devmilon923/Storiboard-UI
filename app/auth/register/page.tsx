@@ -122,8 +122,9 @@ function RegisterPage() {
         );
         setVerifiedUser(result.data);
         setStep(7);
-        console.log("Account verified successfully", result.data);
+        console.log("Account verified successfully");
       } catch (error: any) {
+        form.setError("otp", { message: "Somthing is missing" });
         console.log(error?.message);
       }
     }
@@ -378,7 +379,7 @@ function RegisterPage() {
                     <h3 className="text-xl font-bold text-foreground">
                       Upload Image
                     </h3>
-                    <p className="text-sm text-muted-foreground mt-2 max-w-[260px] mx-auto leading-relaxed">
+                    <p className="text-sm text-muted-foreground mt-2 max-w-65 mx-auto leading-relaxed">
                       Upload your image to continue.
                     </p>
                   </div>
@@ -404,7 +405,7 @@ function RegisterPage() {
                         type="button"
                         onClick={() => open()}
                         variant="outline"
-                        className="w-full max-w-[200px] h-12 border-2 border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group"
+                        className="w-full max-w-50 h-12 border-2 border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group"
                       >
                         <UploadCloud className="w-5 h-5 group-hover:scale-110 transition-transform" />
                         {form.watch("image") ? "Change Image" : "Upload Image"}
@@ -478,7 +479,7 @@ function RegisterPage() {
                     <h3 className="text-xl font-bold text-foreground">
                       Verification Code
                     </h3>
-                    <p className="text-sm text-muted-foreground mt-2 max-w-[260px] mx-auto leading-relaxed">
+                    <p className="text-sm text-muted-foreground mt-2 max-w-65 mx-auto leading-relaxed">
                       We've sent a 6-digit Storiboard verification code to your
                       email. Enter it below to continue.
                     </p>

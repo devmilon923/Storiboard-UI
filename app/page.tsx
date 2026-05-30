@@ -51,6 +51,8 @@ export default function Page() {
       });
       setUser(result.data);
     } catch (error) {
+      form.setError("email", { message: "Invalid email address" });
+      form.setError("password", { message: "Invalid password" });
       console.error("Login failed", error);
     }
   }

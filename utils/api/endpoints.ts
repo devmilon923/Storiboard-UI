@@ -15,10 +15,6 @@ import z from "zod";
 
 const backendURL = process.env.NEXT_PUBLIC_Backend_URL;
 
-// --- Auth session flag helpers ---
-// We use a lightweight localStorage flag to track whether the user *might*
-// have valid httpOnly cookies. This avoids firing profile + renew-token
-// requests on every page load when the user is clearly logged out.
 const AUTH_FLAG_KEY = "logged_in";
 
 function setAuthFlag() {
@@ -42,7 +38,7 @@ function hasAuthFlag(): boolean {
 }
 
 const api = axios.create({
-  baseURL: backendURL,
+  baseURL: "/api",
   withCredentials: true,
 });
 
