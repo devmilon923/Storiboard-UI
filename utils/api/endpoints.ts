@@ -12,6 +12,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import z from "zod";
+import { TEditProfile } from "@/app/home/profile/edit/validation";
 
 const backendURL = process.env.NEXT_PUBLIC_Backend_URL;
 
@@ -66,8 +67,6 @@ api.interceptors.response.use(
           return api(originalRequest);
         }
       } catch (renewError) {
-        // Token renewal failed — cookies are gone, clear the flag so
-        // future page loads skip the profile call entirely.
         clearAuthFlag();
         return Promise.reject(renewError);
       }
@@ -82,6 +81,19 @@ export const useLoginUser = () => {
   return useMutation({
     mutationFn: async (inputs: TLogin) => {
       const result = await api.post<TLogin>("/auth/login", inputs);
+      return result.data;
+    },
+    onSuccess: (data) => {
+      setAuthFlag();
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    },
+  });
+};
+export const useEditProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: TEditProfile) => {
+      const result = await api.patch<TEditProfile>("/user/profile/edit", data);
       return result.data;
     },
     onSuccess: (data) => {

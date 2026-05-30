@@ -16,10 +16,7 @@ import {
   Sparkles,
   Loader2,
   Image as ImageIcon,
-  Heart,
   UserMinus,
-  Settings,
-  BookOpen,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -30,55 +27,14 @@ import { CommentSidebar } from "@/components/comment-sidebar";
 import { useGetAllPosts } from "@/utils/api/endpoints";
 import BookmarkPost from "@/components/bookmarkPost";
 
-// Mock data - replace with your actual API calls
-const MOCK_USER = {
-  id: "1",
-  name: "Sarah Johnson",
-  username: "sarahj",
-  image: null,
-  bio: "Creative director & digital artist. Passionate about design, photography, and coffee.",
-  location: "New York, NY",
-  website: "sarahj.design",
-  joinDate: "2023-01-15",
-  isVerified: true,
-  followerCount: 12450,
-  followingCount: 832,
-  postCount: 12,
-};
-
-const MOCK_OTHER_USER = {
-  id: "2",
-  name: "Michael Chen",
-  username: "michaelc",
-  image: null,
-  bio: "Software engineer | Tech enthusiast | Building cool things",
-  location: "San Francisco, CA",
-  website: "michaelchen.dev",
-  joinDate: "2023-06-20",
-  isVerified: false,
-  followerCount: 3420,
-  followingCount: 456,
-  postCount: 4,
-};
-
 export default function ProfilePage() {
   const router = useRouter();
   const { user: currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState("recent");
+  console.log(currentUser);
 
-  // For demo: change this to false to see "other user" view
-  // In real app, check if profile userId matches current user id
   const isOwnProfile = true;
-
-  const profileUser = isOwnProfile
-    ? {
-        ...MOCK_USER,
-        ...currentUser,
-        image: currentUser?.image || MOCK_USER.image,
-        name: currentUser?.name || MOCK_USER.name,
-        id: currentUser?.id ? String(currentUser.id) : MOCK_USER.id,
-      }
-    : MOCK_OTHER_USER;
+  const profileUser = currentUser;
 
   const [isFollowing, setIsFollowing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -91,14 +47,6 @@ export default function ProfilePage() {
     setIsFollowing(!isFollowing);
   };
 
-  const formatJoinDate = (date: string) => {
-    const joinDate = new Date(date);
-    return `Joined ${joinDate.toLocaleDateString("en-US", {
-      month: "long",
-      year: "numeric",
-    })}`;
-  };
-
   // Fetch real posts
   const { data: postsData, isLoading: isPostsLoading } = useGetAllPosts(20);
   const allPosts: Post[] =
@@ -107,10 +55,11 @@ export default function ProfilePage() {
   // Filter posts by the current profile user
   const userPosts = allPosts.filter((post) => {
     if (!post || !post.author) return false;
+    if (!currentUser) return false;
     const authorIdStr = String(post.author.id);
-    const profileIdStr = String(profileUser.id);
+    const currentUserIdStr = String(currentUser.id);
     return (
-      authorIdStr === profileIdStr || post.author.name === profileUser.name
+      authorIdStr === currentUserIdStr || post.author.name === currentUser.name
     );
   });
 
@@ -132,7 +81,7 @@ export default function ProfilePage() {
   };
 
   const totalPostCount =
-    userPosts.length > 0 ? userPosts.length : profileUser.postCount;
+    userPosts.length > 0 ? userPosts.length : (profileUser?._count?.posts ?? 0);
 
   return (
     <div className="flex w-full min-h-screen bg-background relative">
@@ -150,7 +99,7 @@ export default function ProfilePage() {
               </button>
               <div>
                 <h1 className="font-extrabold tracking-tight text-foreground">
-                  {profileUser.name}
+                  {profileUser?.name}
                 </h1>
                 <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
                   {totalPostCount} {totalPostCount === 1 ? "post" : "posts"}
@@ -168,23 +117,21 @@ export default function ProfilePage() {
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-3xl font-black tracking-tight text-foreground">
-                    {profileUser.name}
+                    {profileUser?.name}
                   </h2>
-                  {profileUser.isVerified && (
+                  {profileUser?.isVerifyed && (
                     <BadgeCheck className="size-6 fill-primary text-primary-foreground shrink-0 shadow-xs" />
                   )}
-                  {isOwnProfile && (
-                    <span className="bg-primary/10 text-primary border border-primary/20 text-[9px] uppercase tracking-widest font-black px-2.5 py-0.5 rounded-full select-none">
-                      Creator
+
+                  {profileUser?.role && (
+                    <span className="bg-primary/10 text-primary border border-primary/20 text-[9px] tracking-widest font-black px-2.5 py-0.5 rounded-full select-none capitalize">
+                      {profileUser.role}
                     </span>
                   )}
                 </div>
-                <p className="text-sm font-semibold text-muted-foreground/80">
-                  @{profileUser.username || "creator"}
-                </p>
               </div>
 
-              {profileUser.bio && (
+              {profileUser?.bio && (
                 <p className="text-foreground/80 text-sm leading-relaxed max-w-xl font-medium">
                   {profileUser.bio}
                 </p>
@@ -192,13 +139,13 @@ export default function ProfilePage() {
 
               {/* Meta tags */}
               <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground/80 pt-1 font-semibold">
-                {profileUser.location && (
+                {profileUser?.address && (
                   <div className="flex items-center gap-1.5 hover:text-foreground transition-colors">
                     <MapPin className="size-4 text-rose-500" />
-                    <span>{profileUser.location}</span>
+                    <span>{profileUser.address}</span>
                   </div>
                 )}
-                {profileUser.website && (
+                {profileUser?.website && (
                   <div className="flex items-center gap-1.5">
                     <Link2 className="size-4 text-primary" />
                     <a
@@ -211,22 +158,24 @@ export default function ProfilePage() {
                     </a>
                   </div>
                 )}
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="size-4 text-emerald-500" />
-                  <span>{formatJoinDate(profileUser.joinDate)}</span>
-                </div>
+                {profileUser?.profession && (
+                  <div className="flex items-center gap-1.5">
+                    <User className="size-4 text-blue-500" />
+                    <span>{profileUser.profession}</span>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Avatar */}
             <div
               className="relative size-24 sm:size-28 rounded-2xl ring-4 ring-muted bg-linear-to-br from-primary/30 to-primary/10 overflow-hidden shadow-md group cursor-pointer shrink-0"
-              onClick={() => router.push(`/profile/${profileUser.id}/photo`)}
+              onClick={() => isOwnProfile && router.push("/home/profile/edit")}
             >
-              {profileUser.image ? (
+              {profileUser?.image ? (
                 <img
                   src={profileUser.image}
-                  alt={profileUser.name}
+                  alt={profileUser?.name || "Profile"}
                   className="h-full w-full object-cover group-hover:scale-105 transition-all duration-500"
                 />
               ) : (
@@ -246,7 +195,7 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
             {/* Stats Block */}
             <div className="flex gap-2 bg-muted/30 border border-border/30 rounded-2xl p-2.5 shadow-xs shrink-0 justify-around sm:justify-start">
-              <div className="text-center px-4 min-w-[70px]">
+              <div className="text-center px-4 min-w-17.5">
                 <div className="font-black text-base text-foreground">
                   {totalPostCount.toLocaleString()}
                 </div>
@@ -255,28 +204,18 @@ export default function ProfilePage() {
                 </div>
               </div>
               <div className="w-px bg-border/40 my-1" />
-              <div
-                className="text-center px-4 min-w-[70px] cursor-pointer hover:text-primary transition-colors group/stat"
-                onClick={() =>
-                  router.push(`/profile/${profileUser.id}/followers`)
-                }
-              >
-                <div className="font-black text-base text-foreground group-hover/stat:scale-105 transition-transform">
-                  {profileUser.followerCount.toLocaleString()}
+              <div className="text-center px-4 min-w-17.5">
+                <div className="font-black text-base text-foreground">
+                  {(profileUser?._count?.followers ?? 0).toLocaleString()}
                 </div>
                 <div className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">
                   followers
                 </div>
               </div>
               <div className="w-px bg-border/40 my-1" />
-              <div
-                className="text-center px-4 min-w-[70px] cursor-pointer hover:text-primary transition-colors group/stat"
-                onClick={() =>
-                  router.push(`/profile/${profileUser.id}/following`)
-                }
-              >
-                <div className="font-black text-base text-foreground group-hover/stat:scale-105 transition-transform">
-                  {profileUser.followingCount.toLocaleString()}
+              <div className="text-center px-4 min-w-17.5">
+                <div className="font-black text-base text-foreground">
+                  {(profileUser?._count?.following ?? 0).toLocaleString()}
                 </div>
                 <div className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">
                   following
@@ -288,7 +227,7 @@ export default function ProfilePage() {
             <div className="flex gap-2 flex-1 sm:justify-end">
               {isOwnProfile ? (
                 <Button
-                  onClick={() => router.push("/settings/profile")}
+                  onClick={() => router.push("/home/profile/edit")}
                   variant="outline"
                   className="w-full sm:w-auto gap-2 cursor-pointer font-bold rounded-xl border-border/60 hover:bg-muted shadow-xs transition-all hover:scale-[1.01] px-5 h-10"
                 >
@@ -329,7 +268,10 @@ export default function ProfilePage() {
                     )}
                   </Button>
                   <Button
-                    onClick={() => router.push(`/messages/${profileUser.id}`)}
+                    onClick={() =>
+                      profileUser?.id &&
+                      router.push(`/messages/${profileUser.id}`)
+                    }
                     variant="outline"
                     className="gap-2 cursor-pointer font-bold rounded-xl border-border/60 hover:bg-muted shadow-xs transition-all hover:scale-[1.01] px-5 h-10"
                   >
@@ -402,7 +344,7 @@ export default function ProfilePage() {
                       <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-6 leading-relaxed">
                         {isOwnProfile
                           ? "You haven't written any stories yet. Share your thoughts, designs, or ideas with the world!"
-                          : `${profileUser.name} hasn't posted anything yet.`}
+                          : `${profileUser?.name} hasn't posted anything yet.`}
                       </p>
                       {isOwnProfile && (
                         <Button

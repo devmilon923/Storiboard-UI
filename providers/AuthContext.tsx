@@ -15,6 +15,17 @@ interface User {
   name: string;
   email: string;
   image: string;
+  _count: {
+    followers: number;
+    following: number;
+    posts: number;
+  };
+  bio: string;
+  website: string;
+  address: string;
+  profession: string;
+  isVerifyed: boolean;
+
   role: "admin" | "user" | "moderator";
 }
 
@@ -56,7 +67,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     return role.includes(user.role);
   };
-
 
   const isLoading = isQueryLoading;
 
