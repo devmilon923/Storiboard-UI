@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   MessageCircle,
@@ -24,15 +24,29 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthContext";
 import { SocialPostCard, Post } from "@/components/social-post-card";
 import { CommentSidebar } from "@/components/comment-sidebar";
-import { useGetAllPosts } from "@/utils/api/endpoints";
+import { useGetAllMyPosts, useGetAllPosts } from "@/utils/api/endpoints";
 import BookmarkPost from "@/components/bookmarkPost";
+import { useInView } from "react-intersection-observer";
 
 export default function ProfilePage() {
-  const router = useRouter();
-  const { user: currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState("recent");
-  console.log(currentUser);
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useGetAllMyPosts(10, activeTab);
+  const router = useRouter();
+  const { ref, inView } = useInView();
+  const { user: currentUser } = useAuth();
 
+  const postData =
+    data?.pages.flatMap((data) => {
+      return data.data;
+    }) || [];
+  useEffect(() => {
+    if (inView && !isLoading && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  console.log(postData);
+  // console.log(data);
   const isOwnProfile = true;
   const profileUser = currentUser;
 
@@ -313,16 +327,16 @@ export default function ProfilePage() {
             <div className="mt-8">
               {activeTab === "recent" && (
                 <div className="space-y-6">
-                  {isPostsLoading ? (
+                  {isLoading ? (
                     <div className="flex flex-col items-center justify-center py-20 text-muted-foreground animate-in fade-in duration-300">
                       <Loader2 className="size-8 animate-spin text-primary mb-4" />
                       <p className="text-xs uppercase font-extrabold tracking-widest animate-pulse">
                         Loading Feed...
                       </p>
                     </div>
-                  ) : userPosts.length > 0 ? (
+                  ) : postData.length > 0 ? (
                     <div className="flex flex-col gap-6 animate-in fade-in duration-500">
-                      {userPosts.map((post) => (
+                      {postData.map((post) => (
                         <SocialPostCard
                           key={post.id}
                           post={post}
@@ -346,17 +360,18 @@ export default function ProfilePage() {
                           ? "You haven't written any stories yet. Share your thoughts, designs, or ideas with the world!"
                           : `${profileUser?.name} hasn't posted anything yet.`}
                       </p>
-                      {isOwnProfile && (
+                      {/* {isOwnProfile && (
                         <Button
-                          onClick={() => router.push("/home")}
+                          onClick={() => router.push("/home/advanced-editor")}
                           className="gap-2 cursor-pointer font-bold rounded-xl shadow-md shadow-primary/15 hover:shadow-primary/25 transition-all"
                         >
                           <PenSquare className="size-4" />
                           Create Story
                         </Button>
-                      )}
+                      )} */}
                     </div>
                   )}
+                  <div ref={ref}></div>
                 </div>
               )}
 

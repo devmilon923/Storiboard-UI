@@ -372,3 +372,16 @@ export const useGetAllFollowers = (
     retry: false,
   });
 };
+export const useGetAllMyPosts = (limit: number = 10, state:string) => {
+  return useInfiniteQuery({
+    queryKey: ["mposts", limit],
+    queryFn: async ({ pageParam }) => {
+      const result = await api.get(`/post/me?pc=${pageParam}&limit=${limit}`);
+      return result.data;
+    },
+    getNextPageParam: (lastPage) => lastPage?.cursor,
+    initialPageParam: 0,
+    enabled: typeof window !== "undefined" && state === "recent",
+    retry: false,
+  });
+};
