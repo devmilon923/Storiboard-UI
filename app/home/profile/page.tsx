@@ -24,7 +24,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthContext";
 import { SocialPostCard, Post } from "@/components/social-post-card";
 import { CommentSidebar } from "@/components/comment-sidebar";
-import { useGetAllMyPosts, useGetAllPosts } from "@/utils/api/endpoints";
+import {
+  useGetAllMyPosts,
+  useGetAllMyTrendingPosts,
+  useGetAllPosts,
+} from "@/utils/api/endpoints";
 import BookmarkPost from "@/components/bookmarkPost";
 import { useInView } from "react-intersection-observer";
 
@@ -32,10 +36,12 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("recent");
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useGetAllMyPosts(10, activeTab);
+  const { data: trendingData, isLoading: trendingDataLoading } =
+    useGetAllMyTrendingPosts(activeTab);
   const router = useRouter();
   const { ref, inView } = useInView();
   const { user: currentUser } = useAuth();
-
+  console.log(trendingData);
   const postData =
     data?.pages.flatMap((data) => {
       return data.data;
@@ -45,7 +51,7 @@ export default function ProfilePage() {
       fetchNextPage();
     }
   }, [inView, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage]);
-  console.log(postData);
+  // console.log(postData);
   // console.log(data);
   const isOwnProfile = true;
   const profileUser = currentUser;
@@ -377,16 +383,16 @@ export default function ProfilePage() {
 
               {activeTab === "trending" && (
                 <div className="space-y-6">
-                  {isPostsLoading ? (
+                  {trendingDataLoading ? (
                     <div className="flex flex-col items-center justify-center py-20 text-muted-foreground animate-in fade-in duration-300">
                       <Loader2 className="size-8 animate-spin text-primary mb-4" />
                       <p className="text-xs uppercase font-extrabold tracking-widest animate-pulse">
                         Loading Trending...
                       </p>
                     </div>
-                  ) : trendingPosts.length > 0 ? (
+                  ) : trendingData.data.length > 0 ? (
                     <div className="flex flex-col gap-6 animate-in fade-in duration-500">
-                      {trendingPosts.map((post) => (
+                      {trendingData.data.map((post: any) => (
                         <SocialPostCard
                           key={post.id}
                           post={post}

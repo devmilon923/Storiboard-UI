@@ -13,6 +13,7 @@ import {
 } from "@tanstack/react-query";
 import z from "zod";
 import { TEditProfile } from "@/app/home/profile/edit/validation";
+import updateCach from "./updateCache";
 
 const backendURL = process.env.NEXT_PUBLIC_Backend_URL;
 
@@ -294,22 +295,10 @@ export const useBookmarkAction = () => {
       return result.data;
     },
     onSuccess: (data, postId) => {
-      console.log(data);
       queryClient.invalidateQueries({ queryKey: ["savePosts"] });
-      queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
-        if (!oldData || !oldData.pages) return oldData;
-        if (data.data === true) {
-          const filteredData = oldData.pages.map((page: any) => {
-            return {
-              ...page,
-              data: page.data.filter((post: any) => post.id !== postId),
-            };
-          });
-          return { ...oldData, pages: filteredData };
-        } else {
-          queryClient.invalidateQueries({ queryKey: ["posts"] });
-        }
-      });
+      updateCach({ queryClient, data, postId, queryKey: "posts" });
+      updateCach({ queryClient, data, postId, queryKey: "mytrending" });
+      updateCach({ queryClient, data, postId, queryKey: "mposts" });
     },
   });
 };
@@ -372,7 +361,7 @@ export const useGetAllFollowers = (
     retry: false,
   });
 };
-export const useGetAllMyPosts = (limit: number = 10, state:string) => {
+export const useGetAllMyPosts = (limit: number = 10, state: string) => {
   return useInfiniteQuery({
     queryKey: ["mposts", limit],
     queryFn: async ({ pageParam }) => {
@@ -382,6 +371,17 @@ export const useGetAllMyPosts = (limit: number = 10, state:string) => {
     getNextPageParam: (lastPage) => lastPage?.cursor,
     initialPageParam: 0,
     enabled: typeof window !== "undefined" && state === "recent",
+    retry: false,
+  });
+};
+export const useGetAllMyTrendingPosts = (status: string) => {
+  return useQuery({
+    queryKey: ["mytrending", status],
+    queryFn: async () => {
+      const result = await api.get("/post/me/trending");
+      return result.data;
+    },
+    enabled: typeof window !== undefined && status === "trending",
     retry: false,
   });
 };
