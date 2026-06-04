@@ -57,7 +57,7 @@ import {
 
 function RegisterPage() {
   const resendOtp = useResendOTP();
-  const [step, setStep] = useState<number>(6);
+  const [step, setStep] = useState<number>(1);
   const [showPassword, setShowPassword] = useState(false);
   const [activeField, setActiveField] = useState<FieldPath<TRegister>[]>([]);
   const [verifiedUser, setVerifiedUser] = useState<any>(null);
