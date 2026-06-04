@@ -29,6 +29,7 @@ import {
   CheckCircle2,
   Eye,
   EyeOff,
+  Loader2,
   Lock,
   Mail,
   PartyPopper,
@@ -48,10 +49,15 @@ import {
   registerSchema,
   TRegister,
 } from "@/utils/api/validations";
-import { useCreateUser, useVerifyAccount } from "@/utils/api/endpoints";
+import {
+  useCreateUser,
+  useResendOTP,
+  useVerifyAccount,
+} from "@/utils/api/endpoints";
 
 function RegisterPage() {
-  const [step, setStep] = useState<number>(1);
+  const resendOtp = useResendOTP();
+  const [step, setStep] = useState<number>(6);
   const [showPassword, setShowPassword] = useState(false);
   const [activeField, setActiveField] = useState<FieldPath<TRegister>[]>([]);
   const [verifiedUser, setVerifiedUser] = useState<any>(null);
@@ -129,6 +135,13 @@ function RegisterPage() {
         });
         console.log(error?.message);
       }
+    }
+  };
+  const handleResendOtp = async () => {
+    try {
+      await resendOtp.mutateAsync();
+    } catch (error: any) {
+      console.log(error.message);
     }
   };
   return (
@@ -529,10 +542,23 @@ function RegisterPage() {
                     Didn't receive a code?{" "}
                     <button
                       type="button"
-                      className="font-semibold text-primary hover:underline transition-all"
+                      onClick={handleResendOtp}
+                      className="font-semibold text-primary cursor-pointer hover:underline transition-all"
                     >
-                      Resend
+                      {resendOtp.isPending ? "Sending..." : "Resend"}
                     </button>
+                    <p>
+                      {resendOtp.isError && (
+                        <span className="text-red-800 text-xs">
+                          {(resendOtp.error as Error)?.message}
+                        </span>
+                      )}
+                      {resendOtp.isSuccess && (
+                        <span className="text-green-800 text-xs">
+                          {resendOtp.data?.message}
+                        </span>
+                      )}
+                    </p>
                   </p>
                 </div>
               </div>
@@ -653,12 +679,22 @@ function RegisterPage() {
 
           {step < 6 ? (
             <Button
+              onClick={goNext}
               variant="premium"
               className="px-8 rounded-full"
-              onClick={goNext}
+              disabled={register.isPending}
             >
-              Next Step
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              {register.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              {register.isPending ? (
+                "Please wait"
+              ) : (
+                <>
+                  Next Step
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </Button>
           ) : step === 6 ? (
             <Button

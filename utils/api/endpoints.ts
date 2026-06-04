@@ -119,9 +119,20 @@ export const useCreateUser = () => {
 export const useResendOTP = () => {
   return useMutation({
     mutationFn: async () => {
-      const result = await api.post("/auth/resend-otp");
-      return result.data;
+      try {
+        const result = await api.post("/auth/resend-otp");
+        return result.data;
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(
+            error.response?.data?.message || "Failed to resend OTP",
+          );
+        }
+
+        throw error;
+      }
     },
+
     onSuccess: (data) => {
       console.log("OTP resent successfully", data);
     },
