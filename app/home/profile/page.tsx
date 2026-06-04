@@ -391,7 +391,7 @@ export default function ProfilePage() {
                       </p>
                     </div>
                   ) : trendingData.data.length > 0 ? (
-                    <div className="flex flex-col gap-6 animate-in fade-in duration-500">
+                    <div className="flex flex-col gap-6  animate-in fade-in duration-500">
                       {trendingData.data.map((post: any) => (
                         <SocialPostCard
                           key={post.id}
