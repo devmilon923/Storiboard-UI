@@ -2,10 +2,10 @@
 
 > **Where imagination finds its voice.** A modern, premium blogging and story-sharing social platform built with Next.js 16, React 19, Tailwind CSS v4, and TanStack Query.
 
-**Backend Repository:** [https://github.com/devmilon923/Storiboard-Server](https://github.com/devmilon923/Storiboard-Server)
+**Backend Repository:** [/Storiboard-Server](https://github.com/devmilon923/Storiboard-Server)
 
-**Live Preview:** [https://storiboard.netlify.app](https://storiboard.netlify.app)
----
+**Live Preview:** [/storiboard](https://storiboard.netlify.app)
+
 
 ## 🌟 Overview
 
