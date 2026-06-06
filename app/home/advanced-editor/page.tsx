@@ -15,6 +15,7 @@ import {
   Heading1,
   Heading3,
   Heading2,
+  Loader2,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -90,7 +91,6 @@ export default function AdvancedEditorPage() {
     try {
       const result = await createPost.mutateAsync(data);
       if (result) {
-        console.log(result);
         editor.commands.setContent("");
         setSelectedFeeling(null);
       }
@@ -269,12 +269,20 @@ export default function AdvancedEditorPage() {
                 {/* Submit */}
                 <Button
                   onClick={handleSubmit}
-                  disabled={!content.trim() || !selectedFeeling}
+                  disabled={
+                    !content.trim() || !selectedFeeling || createPost.isPending
+                  }
                   variant="premium"
                   className="gap-2 px-6 rounded-full cursor-pointer"
                 >
-                  <span className="font-semibold">Post</span>
-                  <Send className="size-3.5" />
+                  <span className="font-semibold">
+                    {createPost.isPending ? "Posting..." : "Post"}
+                  </span>
+                  {createPost.isPending ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <Send className="size-3.5" />
+                  )}
                 </Button>
               </div>
             </div>

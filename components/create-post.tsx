@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Smile, Send, X, Sparkles, SquarePen } from "lucide-react";
+import { Smile, Send, X, Sparkles, SquarePen, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -126,7 +126,7 @@ export const CreatePost = () => {
                 placeholder={`What's on your mind, ${user?.name?.split(" ")[0] || "User"}?`}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="w-full min-h-[100px] resize-none rounded-none border-none bg-transparent p-0 py-2 text-[1rem] focus-visible:ring-0 placeholder:text-muted-foreground/60"
+                className="w-full min-h-25 resize-none rounded-none border-none bg-transparent p-0 py-2 text-[1rem] focus-visible:ring-0 placeholder:text-muted-foreground/60"
               />
 
               {selectedFeeling && (
@@ -199,12 +199,20 @@ export const CreatePost = () => {
 
               <Button
                 onClick={handlePost}
-                disabled={!content.trim() || !selectedFeeling}
+                disabled={
+                  !content.trim() || !selectedFeeling || createPost.isPending
+                }
                 variant="premium"
                 className="gap-2 px-6 rounded-full"
               >
-                <span className="font-semibold">Post</span>
-                <Send className="size-3.5" />
+                <span className="font-semibold">
+                  {createPost.isPending ? "Posting..." : "Post"}
+                </span>
+                {createPost.isPending ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <Send className="size-3.5" />
+                )}
               </Button>
             </div>
           </div>
