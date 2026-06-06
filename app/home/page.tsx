@@ -3,11 +3,10 @@ import React, { useEffect, useState } from "react";
 import { SocialPostCard, Post } from "@/components/social-post-card";
 import { CreatePost } from "@/components/create-post";
 import { useGetAllPosts } from "@/utils/api/endpoints";
-import { Loader2, BookOpen } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CommentSidebar } from "@/components/comment-sidebar";
 import { useInView } from "react-intersection-observer";
-import { Button } from "@/components/ui/button";
 import BookmarkPost from "@/components/bookmarkPost";
 const HomePage: React.FC = () => {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -57,7 +56,9 @@ const HomePage: React.FC = () => {
       {/* Main Feed Section */}
       <div className="flex-1 ">
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <CreatePost />
+          <div data-create-post-section>
+            <CreatePost />
+          </div>
 
           <div className="space-y-6">
             <div className="flex items-center gap-8 border-b border-border/50 px-2">
@@ -92,28 +93,52 @@ const HomePage: React.FC = () => {
             <div className="flex flex-col gap-6 pb-20">
               {activeTab === "trending" ? (
                 <>
-                  {posts?.map((post) => (
-                    <SocialPostCard
-                      key={post.id}
-                      post={post}
-                      onOpenComments={(commentId) =>
-                        handleOpenComments(post, commentId)
-                      }
-                    />
-                  ))}
-                  <div ref={ref} className="py-8 flex justify-center">
-                    {isFetchingNextPage ? (
-                      <Loader2 className="size-6 animate-spin text-primary" />
-                    ) : hasNextPage ? (
-                      <span className="text-sm text-muted-foreground animate-pulse">
-                        Loading more posts...
-                      </span>
-                    ) : (
-                      <span className="text-sm text-muted-foreground italic">
-                        You've reached the end of the feed
-                      </span>
-                    )}
-                  </div>
+                  {posts && posts.length > 0 ? (
+                    <>
+                      {posts.map((post) => (
+                        <SocialPostCard
+                          key={post.id}
+                          post={post}
+                          onOpenComments={(commentId) =>
+                            handleOpenComments(post, commentId)
+                          }
+                        />
+                      ))}
+                      <div ref={ref} className="py-8 flex justify-center">
+                        {isFetchingNextPage ? (
+                          <Loader2 className="size-6 animate-spin text-primary" />
+                        ) : hasNextPage ? (
+                          <span className="text-sm text-muted-foreground animate-pulse">
+                            Loading more posts...
+                          </span>
+                        ) : (
+                          <span className="text-sm text-muted-foreground italic">
+                            You've reached the end of the feed
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 px-4 space-y-3">
+                      <div className="text-center space-y-2">
+                        <h3 className="text-sm font-semibold text-foreground">
+                          No posts yet
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          Start the conversation
+                        </p>
+                        <p className="text-xs text-muted-foreground italic">
+                          Share your thoughts with the community
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => router.push("/home/advanced-editor")}
+                        className="px-4 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors cursor-pointer"
+                      >
+                        Create Post
+                      </button>
+                    </div>
+                  )}
                 </>
               ) : (
                 <BookmarkPost
