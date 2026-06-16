@@ -71,8 +71,8 @@ Make sure you have [Node.js](https://nodejs.org/) (v18.x or higher) and [npm](ht
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/devmilon923/Resume-Builder-UI.git
-   cd youtube
+   git clone https://github.com/devmilon923/Storiboard-UI.git
+   cd Storiboard-UI
    ```
 
 2. **Install Dependencies**:
