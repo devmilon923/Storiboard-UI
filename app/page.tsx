@@ -71,10 +71,9 @@ export default function Page() {
         <div className="absolute -top-[25%] left-1/3 h-175 w-175 rounded-full bg-primary/3 blur-[140px]" />
         <div className="absolute -bottom-[10%] right-1/4 h-125 w-125 rounded-full bg-primary/2 blur-[120px]" />
       </div>
-
       <nav className="relative z-50 w-full">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
-          {/* Brand */}
+
           <Link
             href="/"
             className="group flex items-center gap-2.5"
