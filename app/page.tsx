@@ -63,7 +63,7 @@ export default function Page() {
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-background">
-      {/* ─── Ambient Background ─── */}
+
       <div
         className="pointer-events-none absolute inset-0 -z-10"
         aria-hidden="true"
@@ -72,7 +72,6 @@ export default function Page() {
         <div className="absolute -bottom-[10%] right-1/4 h-125 w-125 rounded-full bg-primary/2 blur-[120px]" />
       </div>
 
-      {/* ─── Navbar ─── */}
       <nav className="relative z-50 w-full">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
           {/* Brand */}
