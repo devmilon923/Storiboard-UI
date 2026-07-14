@@ -52,7 +52,8 @@ export default function AdvancedEditorPage() {
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [1, 2, 3], // Specify allowed heading levels
+          levels: [1, 2, 3],
+          // keepOnSplit: false,
         },
       }),
     ],
@@ -64,7 +65,7 @@ export default function AdvancedEditorPage() {
     editorProps: {
       attributes: {
         class:
-          "w-full min-h-[100px] prose resize-none outline-none bg-transparent py-2 text-[1rem] focus-visible:ring-0",
+          "w-full min-h-[100px] rich-text resize-none outline-none bg-transparent py-2 text-[1rem] focus-visible:ring-0",
       },
     },
   });

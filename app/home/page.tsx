@@ -124,9 +124,7 @@ const HomePage: React.FC = () => {
                         <h3 className="text-sm font-semibold text-foreground">
                           No posts yet
                         </h3>
-                        <p className="text-xs text-muted-foreground">
-                          Start the conversation
-                        </p>
+              
                         <p className="text-xs text-muted-foreground italic">
                           Share your thoughts with the community
                         </p>

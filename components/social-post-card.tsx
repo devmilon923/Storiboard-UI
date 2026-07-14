@@ -155,7 +155,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
 
   return (
     <Card className="group relative w-full overflow-hidden bg-card/40 border-border/40 hover:border-primary/20 transition-all duration-300 backdrop-blur-sm rounded-3xl">
-      <CardHeader className="flex flex-row items-start gap-4 p-5 pb-3">
+      <CardHeader className="flex flex-row items-start gap-4 p-5 pb-0">
         {/* Avatar Section */}
         <div className="relative size-10 shrink-0">
           <div className="h-full w-full overflow-hidden rounded-full border-2 border-primary/20 shadow-sm">
@@ -244,7 +244,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
 
       <CardContent className="px-5 pb-4 pt-0 min-w-0">
         <div
-          className="text-[14px] leading-relaxed text-foreground/80 whitespace-pre-wrap wrap-break-word overflow-hidden [&>p]:mb-2 [&>ul]:list-disc [&>ol]:list-decimal [&>ul]:ml-4 [&>ol]:ml-4 prose"
+          className="text-[1rem] text-foreground/80 break-words overflow-hidden rich-text"
           dangerouslySetInnerHTML={{
             __html:
               typeof window !== "undefined"
