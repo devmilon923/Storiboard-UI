@@ -61,6 +61,7 @@ function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [activeField, setActiveField] = useState<FieldPath<TRegister>[]>([]);
   const [verifiedUser, setVerifiedUser] = useState<any>(null);
+  const [isWidgetLoading, setIsWidgetLoading] = useState(false);
   const router = useRouter();
   const register = useCreateUser();
   const verifyAccount = useVerifyAccount();
@@ -392,17 +393,30 @@ function RegisterPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-foreground">
-                      Upload Image
+                      Add Profile Photo
                     </h3>
                     <p className="text-sm text-muted-foreground mt-2 max-w-65 mx-auto leading-relaxed">
-                      Upload your image to continue.
+                      Choose a photo for your account profile.
                     </p>
                   </div>
                   <CldUploadWidget
                     uploadPreset={
                       process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
                     }
+                    options={{
+                      multiple: false,
+                      resourceType: "image",
+                      clientAllowedFormats: ["png", "jpeg", "jpg", "webp", "gif"],
+                      maxFiles: 1,
+                    }}
+                    onOpen={() => {
+                      setIsWidgetLoading(false);
+                    }}
+                    onClose={() => {
+                      setIsWidgetLoading(false);
+                    }}
                     onSuccess={(result: any) => {
+                      setIsWidgetLoading(false);
                       if (
                         result.event === "success" &&
                         result.info?.secure_url
@@ -412,18 +426,31 @@ function RegisterPage() {
                       }
                     }}
                     onError={(error) => {
+                      setIsWidgetLoading(false);
                       console.error("Upload Error:", error);
                     }}
                   >
                     {({ open }) => (
                       <Button
                         type="button"
-                        onClick={() => open()}
+                        onClick={() => {
+                          setIsWidgetLoading(true);
+                          open();
+                        }}
+                        disabled={isWidgetLoading}
                         variant="outline"
-                        className="w-full max-w-50 h-12 border-2 border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group"
+                        className="w-full max-w-50 h-12 border-2 border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-70 disabled:pointer-events-none"
                       >
-                        <UploadCloud className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        {form.watch("image") ? "Change Image" : "Upload Image"}
+                        {isWidgetLoading ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <UploadCloud className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        )}
+                        {isWidgetLoading
+                          ? "Opening..."
+                          : form.watch("image")
+                            ? "Change Photo"
+                            : "Choose Photo"}
                       </Button>
                     )}
                   </CldUploadWidget>
