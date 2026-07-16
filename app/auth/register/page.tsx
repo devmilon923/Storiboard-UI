@@ -62,9 +62,18 @@ function RegisterPage() {
   const [activeField, setActiveField] = useState<FieldPath<TRegister>[]>([]);
   const [verifiedUser, setVerifiedUser] = useState<any>(null);
   const [isWidgetLoading, setIsWidgetLoading] = useState(false);
+  const [loadingDirection, setLoadingDirection] = useState<"next" | "prev" | null>(null);
   const router = useRouter();
   const register = useCreateUser();
   const verifyAccount = useVerifyAccount();
+
+  const isLoadingNext =
+    loadingDirection === "next" ||
+    register.isPending ||
+    verifyAccount.isPending;
+
+  const isLoadingPrev = loadingDirection === "prev";
+
   const form = useForm<TRegister>({
     resolver: zodResolver(registerSchema),
     mode: "onChange",
@@ -99,30 +108,43 @@ function RegisterPage() {
     const isValid = await stepValidation();
     if (!isValid) return;
 
-    if (step === 5) {
-      try {
+    setLoadingDirection("next");
+    try {
+      if (step === 5) {
         await register.mutateAsync(form.getValues());
         setStep(6);
-      } catch (error: any) {
+      } else if (step < 6) {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        setStep(step + 1);
+      }
+    } catch (error: any) {
+      if (step === 5) {
         form.setError("email", {
           type: "manual",
           message: error?.response?.data?.message,
         });
       }
-    } else if (step < 6) {
-      setStep(step + 1);
+    } finally {
+      setLoadingDirection(null);
     }
   };
 
   const goBack = async () => {
     if (step > 1) {
-      setStep(step - 1);
+      setLoadingDirection("prev");
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        setStep(step - 1);
+      } finally {
+        setLoadingDirection(null);
+      }
     }
   };
   const selectedProfession = form.watch("profession");
   const selectedGender = form.watch("gender");
   const onSubmit = async (data: TRegister) => {
     if (step === 6) {
+      setLoadingDirection("next");
       try {
         const result: any = await verifyAccount.mutateAsync(
           parseInt(data.otp as string),
@@ -135,6 +157,8 @@ function RegisterPage() {
           message: error?.response?.data?.message || "Unknown error",
         });
         console.log(error?.message);
+      } finally {
+        setLoadingDirection(null);
       }
     }
   };
@@ -409,8 +433,12 @@ function RegisterPage() {
                       clientAllowedFormats: ["png", "jpeg", "jpg", "webp", "gif"],
                       maxFiles: 1,
                     }}
-                    onOpen={() => {
-                      setIsWidgetLoading(false);
+                    onDisplayChanged={(result: any) => {
+                      if (result.event === "display-changed") {
+                        if (result.info === "shown" || result.info === "hidden") {
+                          setIsWidgetLoading(false);
+                        }
+                      }
                     }}
                     onClose={() => {
                       setIsWidgetLoading(false);
@@ -695,11 +723,17 @@ function RegisterPage() {
           {step !== 7 && (
             <Button
               variant="ghost"
-              className={`cursor-pointer gap-2 transition-all rounded-full px-8 duration-300 ${step === 1 ? "opacity-0 pointer-events-none" : "hover:bg-background hover:shadow-sm"}`}
+              className={`cursor-pointer gap-2 transition-all rounded-full px-8 duration-300 ${
+                step === 1 ? "opacity-0 pointer-events-none" : "hover:bg-background hover:shadow-sm"
+              }`}
               onClick={goBack}
-              disabled={step === 1}
+              disabled={step === 1 || isLoadingNext || isLoadingPrev}
             >
-              <ArrowLeft className="w-4 h-4" />
+              {isLoadingPrev ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ArrowLeft className="w-4 h-4" />
+              )}
               Previous
             </Button>
           )}
@@ -709,12 +743,12 @@ function RegisterPage() {
               onClick={goNext}
               variant="premium"
               className="px-8 rounded-full"
-              disabled={register.isPending}
+              disabled={isLoadingNext || isLoadingPrev}
             >
-              {register.isPending && (
+              {isLoadingNext && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              {register.isPending ? (
+              {isLoadingNext ? (
                 "Please wait"
               ) : (
                 <>
@@ -728,9 +762,13 @@ function RegisterPage() {
               type="submit"
               form="register-form"
               variant="premium"
-              className="px-10"
+              className="px-10 rounded-full"
+              disabled={isLoadingNext || isLoadingPrev}
             >
-              Complete Registration
+              {isLoadingNext && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              {isLoadingNext ? "Verifying..." : "Complete Registration"}
             </Button>
           ) : null}
         </CardFooter>
