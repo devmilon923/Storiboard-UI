@@ -7,8 +7,9 @@
 @plugin "@tailwindcss/typography";
 
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: var(--font-sans);
+  --font-heading: var(--font-geist-sans);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -125,9 +126,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-geist-sans), Arial, sans-serif;
   }
   html {
     @apply font-sans;
+    font-family: var(--font-geist-sans), Arial, sans-serif;
   }
 }
 
@@ -161,10 +164,12 @@
   margin-bottom: 0;
   line-height: 1.6;
 }
-.rich-text strong, .rich-text b {
+.rich-text strong,
+.rich-text b {
   font-weight: 700;
 }
-.rich-text em, .rich-text i {
+.rich-text em,
+.rich-text i {
   font-style: italic;
 }
 .rich-text u {
@@ -215,4 +220,3 @@
   color: inherit;
   font-size: inherit;
 }
-
